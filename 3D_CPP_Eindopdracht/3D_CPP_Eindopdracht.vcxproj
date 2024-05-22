@@ -102,13 +102,15 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;GLEW_STATIC;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(OPENGL)\lib\imgui;$(OPENGL)\lib\glew-2.1.0\include;$(OPENGL)\lib\glfw-3.3.2\include;$(OPENGL)\lib\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OPENGL)\lib\imgui;$(OPENGL)\lib\glew-2.1.0\include;$(OPENGL)\lib\glfw-3.3.2\include;$(OPENGL)\lib\glm;$(SolutionDir);$(OPENGL)\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(OPENGL)\lib\glfw-3.3.2\x64;$(OPENGL)\lib\glew-2.1.0\lib\Release\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32s.lib;glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -128,10 +130,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\OpenGL\lib\imgui\examples\imgui_impl_glfw.cpp" />
+    <ClCompile Include="..\..\..\..\..\OpenGL\lib\imgui\examples\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="..\..\..\..\..\OpenGL\lib\imgui\imgui.cpp" />
+    <ClCompile Include="..\..\..\..\..\OpenGL\lib\imgui\imgui_demo.cpp" />
+    <ClCompile Include="..\..\..\..\..\OpenGL\lib\imgui\imgui_draw.cpp" />
+    <ClCompile Include="..\..\..\..\..\OpenGL\lib\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="tigl.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\OpenGL\lib\imgui\examples\imgui_impl_glfw.h" />
+    <ClInclude Include="..\..\..\..\..\OpenGL\lib\imgui\examples\imgui_impl_opengl3.h" />
+    <ClInclude Include="..\..\..\..\..\OpenGL\lib\imgui\imconfig.h" />
+    <ClInclude Include="..\..\..\..\..\OpenGL\lib\imgui\imgui.h" />
+    <ClInclude Include="..\..\..\..\..\OpenGL\lib\imgui\imgui_internal.h" />
+    <ClInclude Include="..\..\..\..\..\OpenGL\lib\imgui\imstb_rectpack.h" />
+    <ClInclude Include="..\..\..\..\..\OpenGL\lib\imgui\imstb_textedit.h" />
+    <ClInclude Include="..\..\..\..\..\OpenGL\lib\imgui\imstb_truetype.h" />
     <ClInclude Include="tigl.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
