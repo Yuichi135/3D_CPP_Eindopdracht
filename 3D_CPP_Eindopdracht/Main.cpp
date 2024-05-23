@@ -99,7 +99,7 @@ void init()
 	ocean = std::make_shared<Object>();
 	ocean->position = glm::vec3(0.0f);
 
-	ocean->addComponent(std::make_shared<OceanComponent>(100));
+	ocean->addComponent(std::make_shared<OceanComponent>(200));
 
 	std::cout << "Adding ocean to objects" << std::endl;
 	objects.push_back(ocean);

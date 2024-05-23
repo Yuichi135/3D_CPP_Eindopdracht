@@ -1,6 +1,7 @@
 #include "OceanComponent.h"
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
+#include <thread>
 
 glm::vec2 rotateVector(const glm::vec2& vec, float angle);
 
@@ -17,6 +18,8 @@ OceanComponent::OceanComponent(int size) : size(size), vbo(nullptr)
 		}
 	}
 
+	std::cout << "Created heightmap" << std::endl;
+
 	waveParams.push_back(GerstnerWaveParams{ 1.5f, 0.3f, 0.1f, 1.0f, rotateVector(glm::vec2(1.0f, 0.0f), 0.0f), 2.0f });
 	waveParams.push_back(GerstnerWaveParams{ 1.5f, 0.3f, 0.1f, 1.0f, rotateVector(glm::vec2(1.0f, 0.0f), 0.0f), 2.0f });
 	waveParams.push_back(GerstnerWaveParams{ 1.2f, 0.2f, 0.1f, 3.4f, rotateVector(glm::vec2(1.0f, 0.0f), 60.0f), 1.8f });
@@ -28,7 +31,6 @@ OceanComponent::OceanComponent(int size) : size(size), vbo(nullptr)
 	waveParams.push_back(GerstnerWaveParams{ 0.15f, 0.2f, 0.7f, 1.0f, rotateVector(glm::vec2(1.0f, 0.0f), 20.0f), 3.0f });
 	waveParams.push_back(GerstnerWaveParams{ 0.1f, 0.2f, 0.7f, 1.0f, rotateVector(glm::vec2(1.0f, 0.0f), -20.0f), 4.0f });
 
-	std::cout << "Created heightmap" << std::endl;
 	setUpNormals();
 	setUpVertices();
 }
@@ -166,31 +168,48 @@ void OceanComponent::draw()
 void OceanComponent::update(float deltaTime) {
 	phase += deltaTime;
 
-	for (size_t x = 0; x < size; ++x) {
-		for (size_t y = 0; y < size; ++y) {
-			glm::vec3 worldPos(x - (size / 2.0f), 0, y - (size / 2.0f));;
+	const size_t numThreads = std::thread::hardware_concurrency(); // Get the number of available CPU cores
+	const size_t chunkSize = size / numThreads; // Calculate the chunk size for each thread
 
-			float combinedX = 0;
-			float combinedY = 0;
-			float combinedHeight = 0;
+	std::vector<std::thread> threads;
+	threads.reserve(numThreads);
 
-			for (auto& p : waveParams) {
-				const float dotProduct = glm::dot(p.direction, glm::vec2(x, y));
-				const float phaseDelta = (p.phase + phase) * p.speed;
-				const float angle = p.waveLength * dotProduct + phaseDelta;
-				const float cosAngle = cos(angle);
-				const float sinAngle = sin(angle);
+	for (size_t t = 0; t < numThreads; ++t) {
+		threads.emplace_back([=]() {
+			const size_t startX = t * chunkSize;
+			const size_t endX = (t == numThreads - 1) ? size : (startX + chunkSize);
 
-				combinedX += (p.steepness / p.waveLength) * p.direction.x * cosAngle;
-				combinedY += (p.steepness / p.waveLength) * p.direction.y * cosAngle;
-				combinedHeight += p.radius * sinAngle;
+			for (size_t x = startX; x < endX; ++x) {
+				for (size_t y = 0; y < size; ++y) {
+					glm::vec3 worldPos(x - (size / 2.0f), 0.0f, y - (size / 2.0f));
+
+					float combinedX = 0;
+					float combinedY = 0;
+					float combinedHeight = 0;
+
+					for (auto& p : waveParams) {
+						const float dotProduct = glm::dot(p.direction, glm::vec2(x, y));
+						const float phaseDelta = (p.phase + phase) * p.speed;
+						const float angle = p.waveLength * dotProduct + phaseDelta;
+						const float cosAngle = cos(angle);
+						const float sinAngle = sin(angle);
+
+						combinedX += (p.steepness / p.waveLength) * p.direction.x * cosAngle;
+						combinedY += (p.steepness / p.waveLength) * p.direction.y * cosAngle;
+						combinedHeight += p.radius * sinAngle;
+					}
+
+					glm::vec3 newPos = worldPos + glm::vec3(combinedX, combinedHeight, combinedY);
+
+					// Update vertex position based on the combined Gerstner wave displacements
+					heightMap[x][y] = newPos;
+				}
 			}
+			});
+	}
 
-			glm::vec3 newPos = worldPos + glm::vec3(combinedX, combinedHeight, combinedY);
-
-			// Update vertex position based on the combined Gerstner wave displacements
-			heightMap[x][y] = newPos;
-		}
+	for (auto& thread : threads) {
+		thread.join();
 	}
 
 	setUpVertices();
