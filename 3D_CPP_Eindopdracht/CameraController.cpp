@@ -26,18 +26,20 @@ glm::mat4 CameraController::getMatrix()
 
 void CameraController::update(GLFWwindow* window)
 {
+	int multiplier = (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) ? 1 : 10;
+
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		move(0, 0.05f);
+		move(0, 0.1f * multiplier);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		move(180, 0.05f);
+		move(180, 0.1f * multiplier);
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		move(90, 0.05f);
+		move(90, 0.1f * multiplier);
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		move(-90, 0.05f);
+		move(-90, 0.1f * multiplier);
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-		moveY(-0.05f);
+		moveY(-0.1f * multiplier);
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-		moveY(0.05f);
+		moveY(0.1f * multiplier);
 
 
 	double x, y;

@@ -21,7 +21,6 @@ OceanComponent::OceanComponent(int size) : size(size), vbo(nullptr)
 	std::cout << "Created heightmap" << std::endl;
 
 	waveParams.push_back(GerstnerWaveParams{ 1.5f, 0.3f, 0.1f, 1.0f, rotateVector(glm::vec2(1.0f, 0.0f), 0.0f), 2.0f });
-	waveParams.push_back(GerstnerWaveParams{ 1.5f, 0.3f, 0.1f, 1.0f, rotateVector(glm::vec2(1.0f, 0.0f), 0.0f), 2.0f });
 	waveParams.push_back(GerstnerWaveParams{ 1.2f, 0.2f, 0.1f, 3.4f, rotateVector(glm::vec2(1.0f, 0.0f), 60.0f), 1.8f });
 	waveParams.push_back(GerstnerWaveParams{ 0.9f, 0.2f, 0.16f, 1.0f, rotateVector(glm::vec2(1.0f, 0.0f), 90.0f), 1.0f });
 	waveParams.push_back(GerstnerWaveParams{ 0.8f, 0.3f, 0.2f, 1.0f, rotateVector(glm::vec2(1.0f, 0.0f), 17.0f), 1.5f });
@@ -118,7 +117,7 @@ void OceanComponent::setUpNormals()
 
 glm::vec4 OceanComponent::getColor(float height)
 {
-	float p = (height - -3.0f) / (3.0f - -3.0f);
+	float p = (height - -3.0f) / (4.0f - -3.0f);
 
 	glm::vec4 top = glm::vec4(0.67450980392f, 0.94901960784f, 0.89803921568f, 1); // Very light cyan
 	//glm::vec4 middle = glm::vec4(0.16470588235f, 0.69019607843f, 0.54901960784f, 1); // Cyan
@@ -160,7 +159,7 @@ void OceanComponent::draw()
 {
 	tigl::shader->enableTexture(false);
 	glm::mat4 modelMatrix = glm::mat4(1.0f);
-	modelMatrix = glm::scale(modelMatrix, glm::vec3(0.1f)); // Mogelijk slecht idee
+	modelMatrix = glm::scale(modelMatrix, glm::vec3(1.0f)); // Mogelijk slecht idee
 	tigl::shader->setModelMatrix(modelMatrix);
 	tigl::drawVertices(GL_QUADS, vbo);
 }
