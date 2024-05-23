@@ -136,6 +136,7 @@
     <ClCompile Include="..\..\..\..\..\OpenGL\lib\imgui\imgui_demo.cpp" />
     <ClCompile Include="..\..\..\..\..\OpenGL\lib\imgui\imgui_draw.cpp" />
     <ClCompile Include="..\..\..\..\..\OpenGL\lib\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="CameraController.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="tigl.cpp" />
   </ItemGroup>
@@ -148,6 +149,7 @@
     <ClInclude Include="..\..\..\..\..\OpenGL\lib\imgui\imstb_rectpack.h" />
     <ClInclude Include="..\..\..\..\..\OpenGL\lib\imgui\imstb_textedit.h" />
     <ClInclude Include="..\..\..\..\..\OpenGL\lib\imgui\imstb_truetype.h" />
+    <ClInclude Include="CameraController.h" />
     <ClInclude Include="tigl.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

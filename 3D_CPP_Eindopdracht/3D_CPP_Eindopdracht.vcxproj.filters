@@ -45,6 +45,9 @@
     <ClCompile Include="..\..\..\..\..\OpenGL\lib\imgui\examples\imgui_impl_opengl3.cpp">
       <Filter>Source Files\imgui</Filter>
     </ClCompile>
+    <ClCompile Include="CameraController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tigl.h">
@@ -73,6 +76,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\OpenGL\lib\imgui\examples\imgui_impl_opengl3.h">
       <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraController.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

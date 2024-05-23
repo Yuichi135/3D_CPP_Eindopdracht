@@ -1,5 +1,3 @@
-
-
 #include <iostream>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -9,6 +7,7 @@
 #include <examples/imgui_impl_opengl3.h>
 #include "tigl.h"
 #include <glm/gtc/matrix_transform.hpp>
+#include "CameraController.h"
 
 #pragma comment(lib, "glfw3.lib")
 #pragma comment(lib, "glew32s.lib")
@@ -25,6 +24,7 @@ void draw();
 
 
 GLFWwindow* window;
+CameraController* cameraController;
 const int width = 1900;
 const int height = 1000;
 
@@ -44,7 +44,7 @@ int main(void)
 
 		{
 			ImGui::SetNextWindowPos(ImVec2(0, 0));
-			ImGui::SetNextWindowSize(ImVec2(0, 400));
+			ImGui::SetNextWindowSize(ImVec2(0, 200));
 			ImGui::Begin("Debug Window");
 			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 			static bool vsync = true;
@@ -83,6 +83,10 @@ void init()
 	tigl::shader->setLightSpecular(0, glm::vec3(1, 1, 1));
 	tigl::shader->setShinyness(0);
 
+
+	cameraController = new CameraController(window);
+	glPointSize(5.0f);
+
 	initImGui();
 }
 
@@ -115,7 +119,7 @@ void initImGui() {
 	ImGui::StyleColorsDark();
 }
 
-void onDestroy()
+static void onDestroy()
 {
 	std::cout << "DeInitializing." << std::endl;
 	ImGui_ImplGlfw_Shutdown();
@@ -126,6 +130,20 @@ void onDestroy()
 
 void update()
 {
+	cameraController->update(window);
+}
+
+void drawGroundPlane() {
+	tigl::shader->setModelMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -3.0f, 0.0f)));
+
+	tigl::begin(GL_QUADS);
+
+	tigl::addVertex(Vertex::PC(glm::vec3(-10, 0, 10), glm::vec4(1.0f)));
+	tigl::addVertex(Vertex::PC(glm::vec3(-10, 0, -10), glm::vec4(1.0f)));
+	tigl::addVertex(Vertex::PC(glm::vec3(10, 0, -10), glm::vec4(1.0f)));
+	tigl::addVertex(Vertex::PC(glm::vec3(10, 0, 10), glm::vec4(1.0f)));
+
+	tigl::end();
 }
 
 void draw()
@@ -139,7 +157,7 @@ void draw()
 
 	tigl::shader->setProjectionMatrix(projection);
 	//tigl::shader->setViewMatrix(camera->getMatrix());
-	tigl::shader->setViewMatrix(glm::mat4(1.0f));
+	tigl::shader->setViewMatrix(cameraController->getMatrix());
 	tigl::shader->setModelMatrix(glm::mat4(1.0f));
 
 	tigl::shader->enableColor(true);
@@ -158,4 +176,6 @@ void draw()
 	tigl::shader->enableFog(true);
 	tigl::shader->enableColor(true);
 	glEnable(GL_DEPTH_TEST);
+
+	drawGroundPlane();
 }
