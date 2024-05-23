@@ -12,8 +12,18 @@ class OceanComponent : public DrawComponent {
 	std::vector<Vertex> verts;
 	tigl::VBO* vbo;
 
+	struct GerstnerWaveParams {
+		float radius = 0.0f;
+		float steepness = 0.0f;
+		float waveLength = 0.1f;
+		float phase = 0.0f;
+		glm::vec2 direction = glm::vec2(1.0f, 0.0f);
+		float speed = 1.0f;
+	};
+
 	int size;
 	float phase = 0;
+	std::vector<GerstnerWaveParams> waveParams;
 public:
 	OceanComponent(int size);
 	~OceanComponent();

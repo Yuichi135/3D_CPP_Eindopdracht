@@ -1,5 +1,8 @@
 #include "OceanComponent.h"
 #include <iostream>
+#include <glm/gtc/matrix_transform.hpp>
+
+glm::vec2 rotateVector(const glm::vec2& vec, float angle);
 
 OceanComponent::OceanComponent(int size) : size(size), vbo(nullptr)
 {
@@ -13,6 +16,17 @@ OceanComponent::OceanComponent(int size) : size(size), vbo(nullptr)
 			heightMap[x][y] = glm::vec3(x - (size / 2), sin(x * 0.2) * 3, y - (size / 2));
 		}
 	}
+
+	waveParams.push_back(GerstnerWaveParams{ 1.5f, 0.3f, 0.1f, 1.0f, rotateVector(glm::vec2(1.0f, 0.0f), 0.0f), 2.0f });
+	waveParams.push_back(GerstnerWaveParams{ 1.5f, 0.3f, 0.1f, 1.0f, rotateVector(glm::vec2(1.0f, 0.0f), 0.0f), 2.0f });
+	waveParams.push_back(GerstnerWaveParams{ 1.2f, 0.2f, 0.1f, 3.4f, rotateVector(glm::vec2(1.0f, 0.0f), 60.0f), 1.8f });
+	waveParams.push_back(GerstnerWaveParams{ 0.9f, 0.2f, 0.16f, 1.0f, rotateVector(glm::vec2(1.0f, 0.0f), 90.0f), 1.0f });
+	waveParams.push_back(GerstnerWaveParams{ 0.8f, 0.3f, 0.2f, 1.0f, rotateVector(glm::vec2(1.0f, 0.0f), 17.0f), 1.5f });
+	waveParams.push_back(GerstnerWaveParams{ 0.7f, 0.3f, 0.3f, 1.0f, rotateVector(glm::vec2(1.0f, 0.0f), -38.0f), 1.5f });
+
+	waveParams.push_back(GerstnerWaveParams{ 0.2f, 0.4f, 0.85f, 1.0f, rotateVector(glm::vec2(1.0f, 0.0f), 59.0f), 2.5f });
+	waveParams.push_back(GerstnerWaveParams{ 0.15f, 0.2f, 0.7f, 1.0f, rotateVector(glm::vec2(1.0f, 0.0f), 20.0f), 3.0f });
+	waveParams.push_back(GerstnerWaveParams{ 0.1f, 0.2f, 0.7f, 1.0f, rotateVector(glm::vec2(1.0f, 0.0f), -20.0f), 4.0f });
 
 	std::cout << "Created heightmap" << std::endl;
 	setUpNormals();
@@ -125,6 +139,21 @@ glm::vec4 OceanComponent::getColor(float height)
 	return color;
 }
 
+
+glm::vec2 rotateVector(const glm::vec2& vec, float angle) {
+	float angleRad = glm::radians(angle);
+
+	// Calculate sine and cosine of the angle
+	float cosAngle = cos(angleRad);
+	float sinAngle = sin(angleRad);
+
+	glm::vec2 rotatedVec;
+	rotatedVec.x = vec.x * cosAngle - vec.y * sinAngle;
+	rotatedVec.y = vec.x * sinAngle + vec.y * cosAngle;
+
+	return rotatedVec;
+}
+
 void OceanComponent::draw()
 {
 	tigl::shader->enableTexture(false);
@@ -137,9 +166,30 @@ void OceanComponent::draw()
 void OceanComponent::update(float deltaTime) {
 	phase += deltaTime;
 
-	for (int x = 0; x < size; ++x) {
-		for (int y = 0; y < size; ++y) {
-			heightMap[x][y] = glm::vec3(x - (size / 2), sin(x * 0.2f + phase) * 3, y - (size / 2));
+	for (size_t x = 0; x < size; ++x) {
+		for (size_t y = 0; y < size; ++y) {
+			glm::vec3 worldPos(x - (size / 2.0f), 0, y - (size / 2.0f));;
+
+			float combinedX = 0;
+			float combinedY = 0;
+			float combinedHeight = 0;
+
+			for (auto& p : waveParams) {
+				const float dotProduct = glm::dot(p.direction, glm::vec2(x, y));
+				const float phaseDelta = (p.phase + phase) * p.speed;
+				const float angle = p.waveLength * dotProduct + phaseDelta;
+				const float cosAngle = cos(angle);
+				const float sinAngle = sin(angle);
+
+				combinedX += (p.steepness / p.waveLength) * p.direction.x * cosAngle;
+				combinedY += (p.steepness / p.waveLength) * p.direction.y * cosAngle;
+				combinedHeight += p.radius * sinAngle;
+			}
+
+			glm::vec3 newPos = worldPos + glm::vec3(combinedX, combinedHeight, combinedY);
+
+			// Update vertex position based on the combined Gerstner wave displacements
+			heightMap[x][y] = newPos;
 		}
 	}
 
