@@ -202,8 +202,6 @@ void draw()
 	tigl::shader->enableColor(true);
 	glEnable(GL_DEPTH_TEST);
 
-	ocean->draw();
-
 	// draw objects.
 	for (std::shared_ptr<Object>& object : objects)
 	{
