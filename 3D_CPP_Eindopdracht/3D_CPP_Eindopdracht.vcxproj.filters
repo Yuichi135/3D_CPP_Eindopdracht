@@ -60,6 +60,9 @@
     <ClCompile Include="DrawComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
+    <ClCompile Include="OceanComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tigl.h">
@@ -99,6 +102,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DrawComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="OceanComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>

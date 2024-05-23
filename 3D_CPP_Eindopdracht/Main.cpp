@@ -9,6 +9,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "CameraController.h"
 #include "Object.h"
+#include "OceanComponent.h"
 
 #pragma comment(lib, "glfw3.lib")
 #pragma comment(lib, "glew32s.lib")
@@ -94,10 +95,13 @@ void init()
 	cameraController = new CameraController(window);
 	glPointSize(5.0f);
 
-
+	std::cout << "Creating ocean" << std::endl;
 	ocean = std::make_shared<Object>();
 	ocean->position = glm::vec3(0.0f);
 
+	ocean->addComponent(std::make_shared<OceanComponent>(100));
+
+	std::cout << "Adding ocean to objects" << std::endl;
 	objects.push_back(ocean);
 }
 
@@ -143,12 +147,11 @@ void update()
 {
 	cameraController->update(window);
 
-
 	double currentFrameTime = glfwGetTime();
 	double deltaTime = currentFrameTime - lastFrameTime;
 	lastFrameTime = currentFrameTime;
 
-	// Updated gameObjects.
+	// Update objects.
 	for (std::shared_ptr<Object>& object : objects)
 	{
 		object->update(static_cast<float>(deltaTime));
@@ -199,5 +202,13 @@ void draw()
 	tigl::shader->enableColor(true);
 	glEnable(GL_DEPTH_TEST);
 
-	drawGroundPlane();
+	ocean->draw();
+
+	// draw objects.
+	for (std::shared_ptr<Object>& object : objects)
+	{
+		object->draw();
+	}
+
+	//drawGroundPlane();
 }
