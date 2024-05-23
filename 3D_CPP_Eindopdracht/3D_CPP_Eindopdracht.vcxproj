@@ -138,10 +138,12 @@
     <ClCompile Include="..\..\..\..\..\OpenGL\lib\imgui\imgui_widgets.cpp" />
     <ClCompile Include="CameraController.cpp" />
     <ClCompile Include="Component.cpp" />
+    <ClCompile Include="CubeComponent.cpp" />
     <ClCompile Include="DrawComponent.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="OceanComponent.cpp" />
+    <ClCompile Include="PhysicsComponent.cpp" />
     <ClCompile Include="tigl.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -155,9 +157,11 @@
     <ClInclude Include="..\..\..\..\..\OpenGL\lib\imgui\imstb_truetype.h" />
     <ClInclude Include="CameraController.h" />
     <ClInclude Include="Component.h" />
+    <ClInclude Include="CubeComponent.h" />
     <ClInclude Include="DrawComponent.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="OceanComponent.h" />
+    <ClInclude Include="PhysicsComponent.h" />
     <ClInclude Include="tigl.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

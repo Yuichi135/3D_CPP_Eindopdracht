@@ -17,9 +17,9 @@ public:
 	Object();
 	~Object();
 
-	glm::vec3 position;
-	glm::vec3 rotation = glm::vec3(0, 0, 0);
-	glm::vec3 scale = glm::vec3(1, 1, 1);
+	glm::vec3 position = glm::vec3(0.0f);
+	glm::vec3 rotation = glm::vec3(0.0f);
+	glm::vec3 scale = glm::vec3(1.0f);
 
 	void addComponent(std::shared_ptr<Component> component);
 	void removeComponent(std::shared_ptr<Component> component);

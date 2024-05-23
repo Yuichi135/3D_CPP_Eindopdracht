@@ -10,6 +10,8 @@
 #include "CameraController.h"
 #include "Object.h"
 #include "OceanComponent.h"
+#include "CubeComponent.h"
+#include "PhysicsComponent.h"
 
 #pragma comment(lib, "glfw3.lib")
 #pragma comment(lib, "glew32s.lib")
@@ -99,11 +101,19 @@ void init()
 	std::cout << "Creating ocean" << std::endl;
 	ocean = std::make_shared<Object>();
 	ocean->position = glm::vec3(0.0f);
-
 	ocean->addComponent(std::make_shared<OceanComponent>(150));
 
 	std::cout << "Adding ocean to objects" << std::endl;
 	objects.push_back(ocean);
+
+	std::cout << "Creating cube" << std::endl;
+	std::shared_ptr<Object> cube = std::make_shared<Object>();
+	cube->position = glm::vec3(0.0f);
+
+	cube->addComponent(std::make_shared<CubeComponent>(2.0f));
+	cube->addComponent(std::make_shared<PhysicsComponent>());
+	std::cout << "Adding cube to objects" << std::endl;
+	objects.push_back(cube);
 }
 
 void initWindow()

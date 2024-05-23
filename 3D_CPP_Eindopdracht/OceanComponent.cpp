@@ -14,7 +14,7 @@ OceanComponent::OceanComponent(int size) : size(size), vbo(nullptr)
 
 	for (int x = 0; x < size; ++x) {
 		for (int y = 0; y < size; ++y) {
-			heightMap[x][y] = glm::vec3(x - (size / 2), sin(x * 0.2) * 3, y - (size / 2));
+			heightMap[x][y] = glm::vec3(x - (size / 2), 0.0f, y - (size / 2));
 		}
 	}
 
@@ -166,6 +166,8 @@ void OceanComponent::draw()
 
 void OceanComponent::update(float deltaTime) {
 	phase += deltaTime;
+
+	return;
 
 	const size_t numThreads = std::thread::hardware_concurrency(); // Get the number of available CPU cores
 	const size_t chunkSize = size / numThreads; // Calculate the chunk size for each thread

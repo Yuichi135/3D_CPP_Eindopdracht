@@ -63,6 +63,12 @@
     <ClCompile Include="OceanComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
+    <ClCompile Include="CubeComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tigl.h">
@@ -105,6 +111,12 @@
       <Filter>Components</Filter>
     </ClInclude>
     <ClInclude Include="OceanComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="CubeComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>
