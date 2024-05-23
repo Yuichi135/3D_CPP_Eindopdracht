@@ -8,6 +8,7 @@
 #include "tigl.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include "CameraController.h"
+#include "Object.h"
 
 #pragma comment(lib, "glfw3.lib")
 #pragma comment(lib, "glew32s.lib")
@@ -27,6 +28,10 @@ GLFWwindow* window;
 CameraController* cameraController;
 const int width = 1900;
 const int height = 1000;
+double lastFrameTime = 0;
+
+std::list<std::shared_ptr<Object>> objects;
+std::shared_ptr<Object> ocean;
 
 int main(void)
 {
@@ -70,6 +75,8 @@ int main(void)
 void init()
 {
 	initWindow();
+	initImGui();
+
 	tigl::init();
 
 	glEnable(GL_DEPTH_TEST);
@@ -87,7 +94,11 @@ void init()
 	cameraController = new CameraController(window);
 	glPointSize(5.0f);
 
-	initImGui();
+
+	ocean = std::make_shared<Object>();
+	ocean->position = glm::vec3(0.0f);
+
+	objects.push_back(ocean);
 }
 
 void initWindow()
@@ -131,6 +142,17 @@ static void onDestroy()
 void update()
 {
 	cameraController->update(window);
+
+
+	double currentFrameTime = glfwGetTime();
+	double deltaTime = currentFrameTime - lastFrameTime;
+	lastFrameTime = currentFrameTime;
+
+	// Updated gameObjects.
+	for (std::shared_ptr<Object>& object : objects)
+	{
+		object->update(static_cast<float>(deltaTime));
+	}
 }
 
 void drawGroundPlane() {
