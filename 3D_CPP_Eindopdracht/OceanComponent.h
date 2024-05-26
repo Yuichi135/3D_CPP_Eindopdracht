@@ -28,6 +28,8 @@ public:
 	OceanComponent(int size);
 	~OceanComponent();
 
+	float getHeight(int x, int y);
+
 	virtual void draw() override;
 	virtual void update(float deltaTime) override;
 private:

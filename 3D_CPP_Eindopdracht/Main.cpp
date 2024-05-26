@@ -101,17 +101,18 @@ void init()
 	std::cout << "Creating ocean" << std::endl;
 	ocean = std::make_shared<Object>();
 	ocean->position = glm::vec3(0.0f);
-	ocean->addComponent(std::make_shared<OceanComponent>(150));
+	auto oceanComponent = std::make_shared<OceanComponent>(150);
+	ocean->addComponent(oceanComponent);
 
 	std::cout << "Adding ocean to objects" << std::endl;
 	objects.push_back(ocean);
 
 	std::cout << "Creating cube" << std::endl;
 	std::shared_ptr<Object> cube = std::make_shared<Object>();
-	cube->position = glm::vec3(0.0f);
+	cube->position = glm::vec3(0.0f, 3.0f, -5.0f);
 
 	cube->addComponent(std::make_shared<CubeComponent>(2.0f));
-	cube->addComponent(std::make_shared<PhysicsComponent>());
+	cube->addComponent(std::make_shared<PhysicsComponent>(oceanComponent));
 	std::cout << "Adding cube to objects" << std::endl;
 	objects.push_back(cube);
 }

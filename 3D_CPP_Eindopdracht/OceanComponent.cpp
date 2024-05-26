@@ -155,6 +155,17 @@ glm::vec2 rotateVector(const glm::vec2& vec, float angle) {
 	return rotatedVec;
 }
 
+// Niet helemaal accuraat maar is een probleem voor later
+float OceanComponent::getHeight(int x, int y) {
+	int translatedX = (size / 2 + x);
+	int translatedY = (size / 2 + y);
+
+	if (translatedX > size || translatedX < 0 || translatedY > size || translatedY < 0)
+		return FLT_MIN;
+
+	return heightMap[size / 2 + x][size / 2 + y].y;
+}
+
 void OceanComponent::draw()
 {
 	tigl::shader->enableTexture(false);
@@ -167,7 +178,11 @@ void OceanComponent::draw()
 void OceanComponent::update(float deltaTime) {
 	phase += deltaTime;
 
-	return;
+	//for (int i = 0; i < size * size; i++)
+	//	heightMap[i / size][i % size].y += deltaTime;
+
+	//setUpVertices();
+	//return;
 
 	const size_t numThreads = std::thread::hardware_concurrency(); // Get the number of available CPU cores
 	const size_t chunkSize = size / numThreads; // Calculate the chunk size for each thread
