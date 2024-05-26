@@ -6,13 +6,12 @@
 
 #include <immintrin.h>
 #include <vector>
-#include <thread>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 glm::vec2 rotateVector(const glm::vec2& vec, float angle);
 
-OceanComponent::OceanComponent(int size) : size(size), vbo(nullptr)
+OceanComponent::OceanComponent(glm::vec3& cameraPos, int size) : cameraPos(&cameraPos), size(size), vbo(nullptr)
 {
 	heightMap.resize(size, std::vector<glm::vec3>(size, glm::vec3(0.0f)));
 	normals.resize(size, std::vector<glm::vec3>(size, glm::vec3(0.0f)));
@@ -37,6 +36,8 @@ OceanComponent::OceanComponent(int size) : size(size), vbo(nullptr)
 	waveParams.push_back(GerstnerWaveParams{ 0.15f, 0.2f, 0.7f, 1.0f, rotateVector(glm::vec2(1.0f, 0.0f), 20.0f), 3.0f });
 	waveParams.push_back(GerstnerWaveParams{ 0.1f, 0.2f, 0.7f, 1.0f, rotateVector(glm::vec2(1.0f, 0.0f), -20.0f), 4.0f });
 
+	update(0.0f);
+
 	setUpNormals();
 	setUpVertices();
 }
@@ -45,6 +46,7 @@ OceanComponent::~OceanComponent()
 {
 }
 
+// Big ol bottleneck :(
 void OceanComponent::setUpVertices()
 {
 	verts.clear();
@@ -199,6 +201,7 @@ void OceanComponent::draw()
 	tigl::drawVertices(GL_QUADS, vbo);
 }
 
+// Todo Don't calculated behind camera
 void OceanComponent::update(float deltaTime) {
 	phase += deltaTime;
 
@@ -208,19 +211,39 @@ void OceanComponent::update(float deltaTime) {
 	//setUpVertices();
 	//return;
 
+	int renderDistance = 150;
+
+	// Don't do the calculations if to high
+	if (cameraPos->y > renderDistance * 2 || cameraPos->y < -renderDistance * 2)
+		return;
+
+
+	// Calculate loop bounds for x dimension
+	int startX = (size / 2) - renderDistance - cameraPos->x;
+	int endX = (size / 2) + renderDistance - cameraPos->x;
+	int startY = (size / 2) - renderDistance - cameraPos->z;
+	int endY = (size / 2) + renderDistance - cameraPos->z;
+
+	// Ensure the range is within the bounds of the grid
+	startX = std::max(0, startX);
+	endX = std::min(size, endX);
+	startY = std::max(0, startY);
+	endY = std::min(size, endY);
+
 	const size_t numThreads = std::thread::hardware_concurrency();
-	const size_t chunkSize = size / numThreads;
+	const size_t chunkSizeX = (endX - startX) / numThreads;
+	const size_t chunkSizeY = (endY - startY) / numThreads;
 
 	std::vector<std::thread> threads;
 	threads.reserve(numThreads);
 
 	for (size_t t = 0; t < numThreads; ++t) {
 		threads.emplace_back([=]() { // Capture 'this' to access member variables
-			const size_t startX = t * chunkSize;
-			const size_t endX = (t == numThreads - 1) ? size : (startX + chunkSize);
+			const size_t threadStartX = startX + t * chunkSizeX;
+			const size_t threadEndX = (t == numThreads - 1) ? endX : (startX + (t + 1) * chunkSizeX);
 
-			for (size_t x = startX; x < endX; ++x) {
-				for (size_t y = 0; y < size; ++y) {
+			for (int x = threadStartX; x < threadEndX; ++x) {
+				for (int y = startY; y < endY; ++y) {
 					glm::vec3 worldPos(x - (size / 2.0f), 0.0f, y - (size / 2.0f));
 
 					__m256 combinedX = _mm256_setzero_ps();

@@ -28,7 +28,7 @@ void draw();
 
 
 GLFWwindow* window;
-CameraController* cameraController;
+std::shared_ptr<CameraController> cameraController;
 const int width = 1900;
 const int height = 1000;
 double lastFrameTime = 0;
@@ -95,13 +95,13 @@ void init()
 	tigl::shader->setShinyness(0);
 
 
-	cameraController = new CameraController(window);
+	cameraController = std::make_shared<CameraController>(window);
 	glPointSize(5.0f);
 
 	std::cout << "Creating ocean" << std::endl;
 	ocean = std::make_shared<Object>();
 	ocean->position = glm::vec3(0.0f);
-	auto oceanComponent = std::make_shared<OceanComponent>(500);
+	auto oceanComponent = std::make_shared<OceanComponent>(cameraController->position, 500);
 	ocean->addComponent(oceanComponent);
 
 	std::cout << "Adding ocean to objects" << std::endl;
