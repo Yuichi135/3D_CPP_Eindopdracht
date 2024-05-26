@@ -33,7 +33,7 @@ void PhysicsComponent::update(float deltaTime) {
 	applyForce(glm::vec3(0.0f, -gravity, 0.0f));
 
 	glm::vec3 velocity = parentObject->position - positionOld;
-	velocity *= 0.99; // shitty drag
+	velocity *= 0.98; // shitty drag
 
 	positionOld = parentObject->position;
 

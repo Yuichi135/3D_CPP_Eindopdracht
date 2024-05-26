@@ -109,7 +109,7 @@ void init()
 
 	std::cout << "Creating cube" << std::endl;
 	std::shared_ptr<Object> cube = std::make_shared<Object>();
-	cube->position = glm::vec3(0.0f, 3.0f, -5.0f);
+	cube->position = glm::vec3(0.0f, 5.0f, -5.0f);
 
 	cube->addComponent(std::make_shared<CubeComponent>(2.0f));
 	cube->addComponent(std::make_shared<PhysicsComponent>(oceanComponent));

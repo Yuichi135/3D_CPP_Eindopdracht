@@ -1,6 +1,7 @@
 #include "OceanComponent.h"
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/norm.hpp>
 #include <thread>
 
 glm::vec2 rotateVector(const glm::vec2& vec, float angle);
@@ -155,15 +156,32 @@ glm::vec2 rotateVector(const glm::vec2& vec, float angle) {
 	return rotatedVec;
 }
 
-// Niet helemaal accuraat maar is een probleem voor later
+// Goed genoeg voor nu
 float OceanComponent::getHeight(int x, int y) {
-	int translatedX = (size / 2 + x);
-	int translatedY = (size / 2 + y);
+	int searchGridSize = 3;
 
-	if (translatedX > size || translatedX < 0 || translatedY > size || translatedY < 0)
-		return FLT_MIN;
+	glm::vec2 pos((float)x, (float)y);
+	float closestHeight = 0.0f; // of FLT_MIN
+	float closestDistancesqrd = FLT_MAX;
 
-	return heightMap[size / 2 + x][size / 2 + y].y;
+	for (int i = -searchGridSize; i <= searchGridSize; i++) {
+		for (int j = -searchGridSize; j <= searchGridSize; j++) {
+			int translatedX = (size / 2 + x) + i;
+			int translatedY = (size / 2 + y) + j;
+
+			if (translatedX >= size || translatedX < 0 || translatedY >= size || translatedY < 0)
+				continue;
+
+			float distancesqrd = glm::distance2(pos, glm::vec2(heightMap[translatedX][translatedY].x, heightMap[translatedX][translatedY].y));
+
+			if (distancesqrd < closestDistancesqrd) {
+				closestDistancesqrd = distancesqrd;
+				closestHeight = heightMap[translatedX][translatedY].y;
+			}
+		}
+	}
+
+	return closestHeight;
 }
 
 void OceanComponent::draw()
