@@ -22,7 +22,7 @@ class OceanComponent : public DrawComponent {
 		glm::vec2 direction = glm::vec2(1.0f, 0.0f);
 		float speed = 1.0f;
 	};
-
+	int renderDistance = 120;
 	int size;
 	float phase = 0;
 	std::vector<GerstnerWaveParams> waveParams;
@@ -39,4 +39,5 @@ private:
 	void setUpTextureCoordinates();
 	void setUpNormals();
 	glm::vec4 getColor(float height);
+	void calculateLoopBounds(int size, int renderDistance, int& startX, int& endX, int& startY, int& endY);
 };

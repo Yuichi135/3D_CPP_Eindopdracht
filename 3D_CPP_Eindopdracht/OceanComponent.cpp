@@ -36,8 +36,6 @@ OceanComponent::OceanComponent(glm::vec3& cameraPos, int size) : cameraPos(&came
 	waveParams.push_back(GerstnerWaveParams{ 0.15f, 0.2f, 0.7f, 1.0f, rotateVector(glm::vec2(1.0f, 0.0f), 20.0f), 3.0f });
 	waveParams.push_back(GerstnerWaveParams{ 0.1f, 0.2f, 0.7f, 1.0f, rotateVector(glm::vec2(1.0f, 0.0f), -20.0f), 4.0f });
 
-	update(0.0f);
-
 	setUpNormals();
 	setUpVertices();
 }
@@ -51,8 +49,11 @@ void OceanComponent::setUpVertices()
 {
 	verts.clear();
 
-	for (int x = 0; x < size - 1; x++) {
-		for (int y = 0; y < size - 1; y++) {
+	int startX, endX, startY, endY;
+	calculateLoopBounds(size, renderDistance, startX, endX, startY, endY);
+
+	for (int x = startX; x < endX - 1; x++) {
+		for (int y = startY; y < endY - 1; y++) {
 			//// "Pixalated"
 			//glm::vec4 color = getColor(heightMap[x][y].y);
 			//// Update vertex positions based on the updated heightMap
@@ -149,6 +150,19 @@ glm::vec4 OceanComponent::getColor(float height)
 	return color;
 }
 
+void OceanComponent::calculateLoopBounds(int size, int renderDistance, int& startX, int& endX, int& startY, int& endY)
+{
+	startX = (size / 2) - renderDistance - cameraPos->x;
+	endX = (size / 2) + renderDistance - cameraPos->x;
+	startY = (size / 2) - renderDistance - cameraPos->z;
+	endY = (size / 2) + renderDistance - cameraPos->z;
+
+	startX = std::max(0, startX);
+	endX = std::min(size, endX);
+	startY = std::max(0, startY);
+	endY = std::min(size, endY);
+}
+
 
 glm::vec2 rotateVector(const glm::vec2& vec, float angle) {
 	float angleRad = glm::radians(angle);
@@ -202,33 +216,16 @@ void OceanComponent::draw()
 }
 
 // Todo Don't calculated behind camera
+// Todo use heightmap dynamically, not a fixed size (uses a lot of memory)
 void OceanComponent::update(float deltaTime) {
 	phase += deltaTime;
 
-	//for (int i = 0; i < size * size; i++)
-	//	heightMap[i / size][i % size].y += deltaTime;
-
-	//setUpVertices();
-	//return;
-
-	int renderDistance = 150;
-
 	// Don't do the calculations if to high
-	if (cameraPos->y > renderDistance * 2 || cameraPos->y < -renderDistance * 2)
+	if (cameraPos->y > renderDistance || cameraPos->y < -renderDistance)
 		return;
 
-
-	// Calculate loop bounds for x dimension
-	int startX = (size / 2) - renderDistance - cameraPos->x;
-	int endX = (size / 2) + renderDistance - cameraPos->x;
-	int startY = (size / 2) - renderDistance - cameraPos->z;
-	int endY = (size / 2) + renderDistance - cameraPos->z;
-
-	// Ensure the range is within the bounds of the grid
-	startX = std::max(0, startX);
-	endX = std::min(size, endX);
-	startY = std::max(0, startY);
-	endY = std::min(size, endY);
+	int startX, endX, startY, endY;
+	calculateLoopBounds(size, renderDistance, startX, endX, startY, endY);
 
 	const size_t numThreads = std::thread::hardware_concurrency();
 	const size_t chunkSizeX = (endX - startX) / numThreads;
@@ -341,5 +338,6 @@ void OceanComponent::update(float deltaTime) {
 		thread.join();
 	}
 
+	//setUpNormals();
 	setUpVertices();
 }

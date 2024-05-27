@@ -101,7 +101,7 @@ void init()
 	std::cout << "Creating ocean" << std::endl;
 	ocean = std::make_shared<Object>();
 	ocean->position = glm::vec3(0.0f);
-	auto oceanComponent = std::make_shared<OceanComponent>(cameraController->position, 500);
+	auto oceanComponent = std::make_shared<OceanComponent>(cameraController->position, 1000);
 	ocean->addComponent(oceanComponent);
 
 	std::cout << "Adding ocean to objects" << std::endl;
