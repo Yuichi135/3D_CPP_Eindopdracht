@@ -12,6 +12,7 @@
 #include "OceanComponent.h"
 #include "CubeComponent.h"
 #include "PhysicsComponent.h"
+#include <string>
 
 #pragma comment(lib, "glfw3.lib")
 #pragma comment(lib, "glew32s.lib")
@@ -46,13 +47,14 @@ int main(void)
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
+		//ImGui::ShowDemoWindow(0);
 
 		update();
 		draw();
 
 		{
 			ImGui::SetNextWindowPos(ImVec2(0, 0));
-			ImGui::SetNextWindowSize(ImVec2(0, 200));
+			//ImGui::SetNextWindowSize(ImVec2(0, 200));
 			ImGui::Begin("Debug Window");
 			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 			static bool vsync = true;
@@ -60,6 +62,24 @@ int main(void)
 			{
 				glfwSwapInterval(vsync ? 1 : 0);
 			}
+
+			for (int i = 0; i < ocean->getComponent<OceanComponent>()->waveParams.size(); ++i)
+			{
+				auto& p = ocean->getComponent<OceanComponent>()->waveParams[i];
+
+				ImGui::SliderFloat(("Radius##" + std::to_string(i)).c_str(), &p.radius, 0.0f, 3.0f);
+				ImGui::SliderFloat(("Steepness##" + std::to_string(i)).c_str(), &p.steepness, 0.0f, 0.7f);
+				ImGui::SliderFloat(("WaveLength##" + std::to_string(i)).c_str(), &p.waveLength, 0.01f, 0.9f);
+				ImGui::SliderFloat(("Speed##" + std::to_string(i)).c_str(), &p.speed, 0.1f, 5.0f);
+
+				ImGui::SliderFloat(("Direction X##" + std::to_string(i)).c_str(), &p.direction.x, -1.0f, 1.0f);
+				ImGui::SliderFloat(("Direction Y##" + std::to_string(i)).c_str(), &p.direction.y, -1.0f, 1.0f);
+				glm::vec2 normalized = glm::normalize(p.direction);
+				p.direction = normalized;
+
+				ImGui::Spacing();
+			}
+
 			ImGui::End();
 		}
 

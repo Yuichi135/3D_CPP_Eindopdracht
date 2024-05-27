@@ -26,6 +26,7 @@ OceanComponent::OceanComponent(glm::vec3& cameraPos, int size) : cameraPos(&came
 
 	std::cout << "Created heightmap" << std::endl;
 
+	// Werkt goed
 	waveParams.push_back(GerstnerWaveParams{ 1.5f, 0.3f, 0.1f, 1.0f, rotateVector(glm::vec2(1.0f, 0.0f), 0.0f), 2.0f });
 	waveParams.push_back(GerstnerWaveParams{ 1.2f, 0.2f, 0.1f, 3.4f, rotateVector(glm::vec2(1.0f, 0.0f), 60.0f), 1.8f });
 	waveParams.push_back(GerstnerWaveParams{ 0.9f, 0.2f, 0.16f, 1.0f, rotateVector(glm::vec2(1.0f, 0.0f), 90.0f), 1.0f });
@@ -35,6 +36,18 @@ OceanComponent::OceanComponent(glm::vec3& cameraPos, int size) : cameraPos(&came
 	waveParams.push_back(GerstnerWaveParams{ 0.2f, 0.4f, 0.85f, 1.0f, rotateVector(glm::vec2(1.0f, 0.0f), 59.0f), 2.5f });
 	waveParams.push_back(GerstnerWaveParams{ 0.15f, 0.2f, 0.7f, 1.0f, rotateVector(glm::vec2(1.0f, 0.0f), 20.0f), 3.0f });
 	waveParams.push_back(GerstnerWaveParams{ 0.1f, 0.2f, 0.7f, 1.0f, rotateVector(glm::vec2(1.0f, 0.0f), -20.0f), 4.0f });
+
+	// WIP
+	waveParams.push_back(GerstnerWaveParams{ 0.0f, 0.0f, 1.0f, 0.0f, rotateVector(glm::vec2(1.0f, 0.0f), 0.0f), 1.0f });
+	waveParams.push_back(GerstnerWaveParams{ 0.0f, 0.0f, 1.0f, 0.0f, rotateVector(glm::vec2(1.0f, 0.0f), 0.0f), 1.0f });
+	waveParams.push_back(GerstnerWaveParams{ 0.0f, 0.0f, 1.0f, 0.0f, rotateVector(glm::vec2(1.0f, 0.0f), 0.0f), 1.0f });
+	waveParams.push_back(GerstnerWaveParams{ 0.0f, 0.0f, 1.0f, 0.0f, rotateVector(glm::vec2(1.0f, 0.0f), 0.0f), 1.0f });
+
+
+	waveParams.push_back(GerstnerWaveParams{ 0.0f, 0.0f, 1.0f, 0.0f, rotateVector(glm::vec2(1.0f, 0.0f), 0.0f), 1.0f });
+	waveParams.push_back(GerstnerWaveParams{ 0.0f, 0.0f, 1.0f, 0.0f, rotateVector(glm::vec2(1.0f, 0.0f), 0.0f), 1.0f });
+	waveParams.push_back(GerstnerWaveParams{ 0.0f, 0.0f, 1.0f, 0.0f, rotateVector(glm::vec2(1.0f, 0.0f), 0.0f), 1.0f });
+	waveParams.push_back(GerstnerWaveParams{ 0.0f, 0.0f, 1.0f, 0.0f, rotateVector(glm::vec2(1.0f, 0.0f), 0.0f), 1.0f });
 
 	setUpNormals();
 	setUpVertices();
@@ -180,7 +193,7 @@ glm::vec2 rotateVector(const glm::vec2& vec, float angle) {
 
 // Goed genoeg voor nu
 float OceanComponent::getHeight(int x, int y) {
-	int searchGridSize = 3;
+	int searchGridSize = 5;
 
 	glm::vec2 pos((float)x, (float)y);
 	float closestHeight = 0.0f; // of FLT_MIN

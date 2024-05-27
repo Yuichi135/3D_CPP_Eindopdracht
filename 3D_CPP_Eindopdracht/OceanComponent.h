@@ -25,8 +25,9 @@ class OceanComponent : public DrawComponent {
 	int renderDistance = 120;
 	int size;
 	float phase = 0;
-	std::vector<GerstnerWaveParams> waveParams;
 public:
+	std::vector<GerstnerWaveParams> waveParams;
+
 	OceanComponent(glm::vec3& cameraPos, int size);
 	~OceanComponent();
 
