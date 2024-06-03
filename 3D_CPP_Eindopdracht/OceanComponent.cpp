@@ -176,6 +176,103 @@ void OceanComponent::calculateLoopBounds(int size, int renderDistance, int& star
 	endY = std::min(size, endY);
 }
 
+// Reference gebruiken misschien
+glm::vec3 OceanComponent::calculateVertex(glm::vec3 pos)
+{
+	float x = pos.x;
+	float y = pos.z;
+
+	__m256 combinedX = _mm256_setzero_ps();
+	__m256 combinedY = _mm256_setzero_ps();
+	__m256 combinedHeight = _mm256_setzero_ps();
+
+	for (size_t i = 0; i < waveParams.size(); i += 8) {
+		// Load wave parameters into SIMD registers
+		__m256 pDirectionX = _mm256_set_ps(
+			waveParams[i + 7].direction.x, waveParams[i + 6].direction.x, waveParams[i + 5].direction.x,
+			waveParams[i + 4].direction.x, waveParams[i + 3].direction.x, waveParams[i + 2].direction.x,
+			waveParams[i + 1].direction.x, waveParams[i].direction.x);
+
+		__m256 pDirectionY = _mm256_set_ps(
+			waveParams[i + 7].direction.y, waveParams[i + 6].direction.y, waveParams[i + 5].direction.y,
+			waveParams[i + 4].direction.y, waveParams[i + 3].direction.y, waveParams[i + 2].direction.y,
+			waveParams[i + 1].direction.y, waveParams[i].direction.y);
+
+		__m256 pPhase = _mm256_set_ps(
+			waveParams[i + 7].phase, waveParams[i + 6].phase, waveParams[i + 5].phase,
+			waveParams[i + 4].phase, waveParams[i + 3].phase, waveParams[i + 2].phase,
+			waveParams[i + 1].phase, waveParams[i].phase);
+
+		__m256 pSpeed = _mm256_set_ps(
+			waveParams[i + 7].speed, waveParams[i + 6].speed, waveParams[i + 5].speed,
+			waveParams[i + 4].speed, waveParams[i + 3].speed, waveParams[i + 2].speed,
+			waveParams[i + 1].speed, waveParams[i].speed);
+
+		__m256 pWaveLength = _mm256_set_ps(
+			waveParams[i + 7].waveLength, waveParams[i + 6].waveLength, waveParams[i + 5].waveLength,
+			waveParams[i + 4].waveLength, waveParams[i + 3].waveLength, waveParams[i + 2].waveLength,
+			waveParams[i + 1].waveLength, waveParams[i].waveLength);
+
+		__m256 pSteepness = _mm256_set_ps(
+			waveParams[i + 7].steepness, waveParams[i + 6].steepness, waveParams[i + 5].steepness,
+			waveParams[i + 4].steepness, waveParams[i + 3].steepness, waveParams[i + 2].steepness,
+			waveParams[i + 1].steepness, waveParams[i].steepness);
+
+		__m256 pRadius = _mm256_set_ps(
+			waveParams[i + 7].radius, waveParams[i + 6].radius, waveParams[i + 5].radius,
+			waveParams[i + 4].radius, waveParams[i + 3].radius, waveParams[i + 2].radius,
+			waveParams[i + 1].radius, waveParams[i].radius);
+
+		__m256 x_vec = _mm256_set1_ps(static_cast<float>(x));
+		__m256 y_vec = _mm256_set1_ps(static_cast<float>(y));
+
+		// Calculate dotProduct
+		__m256 dotProduct = _mm256_add_ps(_mm256_mul_ps(pDirectionX, x_vec), _mm256_mul_ps(pDirectionY, y_vec));
+
+		// Calculate phaseDelta
+		__m256 phaseDelta = _mm256_mul_ps(_mm256_add_ps(pPhase, _mm256_set1_ps(phase)), pSpeed);
+
+		// Calculate angle
+		__m256 angle = _mm256_add_ps(_mm256_mul_ps(pWaveLength, dotProduct), phaseDelta);
+
+		__m256 cosAngle = _mm256_cos_ps(angle);
+		__m256 sinAngle = _mm256_sin_ps(angle);
+
+		// Update combined values
+		combinedX = _mm256_add_ps(combinedX, _mm256_mul_ps(_mm256_div_ps(pSteepness, pWaveLength), _mm256_mul_ps(pDirectionX, cosAngle)));
+		combinedY = _mm256_add_ps(combinedY, _mm256_mul_ps(_mm256_div_ps(pSteepness, pWaveLength), _mm256_mul_ps(pDirectionY, cosAngle)));
+		combinedHeight = _mm256_add_ps(combinedHeight, _mm256_mul_ps(pRadius, sinAngle));
+	}
+
+	// Extract results from SIMD registers
+	float combinedX_scalar[8];
+	float combinedY_scalar[8];
+	float combinedHeight_scalar[8];
+
+	_mm256_store_ps(combinedX_scalar, combinedX);
+	_mm256_store_ps(combinedY_scalar, combinedY);
+	_mm256_store_ps(combinedHeight_scalar, combinedHeight);
+
+	// Sum up the results
+	float finalCombinedX = 0;
+	float finalCombinedY = 0;
+	float finalCombinedHeight = 0;
+	for (int i = 0; i < 8; ++i) {
+		finalCombinedX += combinedX_scalar[i];
+		finalCombinedY += combinedY_scalar[i];
+		finalCombinedHeight += combinedHeight_scalar[i];
+	}
+
+	glm::vec3 worldPos;
+
+	// Update vertex position based on the combined Gerstner wave displacements
+	worldPos.x = x - (size / 2.0f) + finalCombinedX;
+	worldPos.y = pos.y + finalCombinedHeight;
+	worldPos.z = y - (size / 2.0f) + finalCombinedY;
+
+	return worldPos;
+}
+
 
 glm::vec2 rotateVector(const glm::vec2& vec, float angle) {
 	float angleRad = glm::radians(angle);
@@ -254,94 +351,7 @@ void OceanComponent::update(float deltaTime) {
 
 			for (int x = threadStartX; x < threadEndX; ++x) {
 				for (int y = startY; y < endY; ++y) {
-					glm::vec3 worldPos(x - (size / 2.0f), 0.0f, y - (size / 2.0f));
-
-					__m256 combinedX = _mm256_setzero_ps();
-					__m256 combinedY = _mm256_setzero_ps();
-					__m256 combinedHeight = _mm256_setzero_ps();
-
-					for (size_t i = 0; i < waveParams.size(); i += 8) {
-						// Load wave parameters into SIMD registers
-						__m256 pDirectionX = _mm256_set_ps(
-							waveParams[i + 7].direction.x, waveParams[i + 6].direction.x, waveParams[i + 5].direction.x,
-							waveParams[i + 4].direction.x, waveParams[i + 3].direction.x, waveParams[i + 2].direction.x,
-							waveParams[i + 1].direction.x, waveParams[i].direction.x);
-
-						__m256 pDirectionY = _mm256_set_ps(
-							waveParams[i + 7].direction.y, waveParams[i + 6].direction.y, waveParams[i + 5].direction.y,
-							waveParams[i + 4].direction.y, waveParams[i + 3].direction.y, waveParams[i + 2].direction.y,
-							waveParams[i + 1].direction.y, waveParams[i].direction.y);
-
-						__m256 pPhase = _mm256_set_ps(
-							waveParams[i + 7].phase, waveParams[i + 6].phase, waveParams[i + 5].phase,
-							waveParams[i + 4].phase, waveParams[i + 3].phase, waveParams[i + 2].phase,
-							waveParams[i + 1].phase, waveParams[i].phase);
-
-						__m256 pSpeed = _mm256_set_ps(
-							waveParams[i + 7].speed, waveParams[i + 6].speed, waveParams[i + 5].speed,
-							waveParams[i + 4].speed, waveParams[i + 3].speed, waveParams[i + 2].speed,
-							waveParams[i + 1].speed, waveParams[i].speed);
-
-						__m256 pWaveLength = _mm256_set_ps(
-							waveParams[i + 7].waveLength, waveParams[i + 6].waveLength, waveParams[i + 5].waveLength,
-							waveParams[i + 4].waveLength, waveParams[i + 3].waveLength, waveParams[i + 2].waveLength,
-							waveParams[i + 1].waveLength, waveParams[i].waveLength);
-
-						__m256 pSteepness = _mm256_set_ps(
-							waveParams[i + 7].steepness, waveParams[i + 6].steepness, waveParams[i + 5].steepness,
-							waveParams[i + 4].steepness, waveParams[i + 3].steepness, waveParams[i + 2].steepness,
-							waveParams[i + 1].steepness, waveParams[i].steepness);
-
-						__m256 pRadius = _mm256_set_ps(
-							waveParams[i + 7].radius, waveParams[i + 6].radius, waveParams[i + 5].radius,
-							waveParams[i + 4].radius, waveParams[i + 3].radius, waveParams[i + 2].radius,
-							waveParams[i + 1].radius, waveParams[i].radius);
-
-						__m256 x_vec = _mm256_set1_ps(static_cast<float>(x));
-						__m256 y_vec = _mm256_set1_ps(static_cast<float>(y));
-
-						// Calculate dotProduct
-						__m256 dotProduct = _mm256_add_ps(_mm256_mul_ps(pDirectionX, x_vec), _mm256_mul_ps(pDirectionY, y_vec));
-
-						// Calculate phaseDelta
-						__m256 phaseDelta = _mm256_mul_ps(_mm256_add_ps(pPhase, _mm256_set1_ps(phase)), pSpeed);
-
-						// Calculate angle
-						__m256 angle = _mm256_add_ps(_mm256_mul_ps(pWaveLength, dotProduct), phaseDelta);
-
-						// Calculate cosine and sine of angle (placeholder functions, replace with actual intrinsics if available)
-						__m256 cosAngle = _mm256_cos_ps(angle);  // You'll need to define or replace these functions
-						__m256 sinAngle = _mm256_sin_ps(angle);  // You'll need to define or replace these functions
-
-						// Update combined values
-						combinedX = _mm256_add_ps(combinedX, _mm256_mul_ps(_mm256_div_ps(pSteepness, pWaveLength), _mm256_mul_ps(pDirectionX, cosAngle)));
-						combinedY = _mm256_add_ps(combinedY, _mm256_mul_ps(_mm256_div_ps(pSteepness, pWaveLength), _mm256_mul_ps(pDirectionY, cosAngle)));
-						combinedHeight = _mm256_add_ps(combinedHeight, _mm256_mul_ps(pRadius, sinAngle));
-					}
-
-					// Extract results from SIMD registers
-					float combinedX_scalar[8];
-					float combinedY_scalar[8];
-					float combinedHeight_scalar[8];
-
-					_mm256_store_ps(combinedX_scalar, combinedX);
-					_mm256_store_ps(combinedY_scalar, combinedY);
-					_mm256_store_ps(combinedHeight_scalar, combinedHeight);
-
-					// Sum up the results
-					float finalCombinedX = 0;
-					float finalCombinedY = 0;
-					float finalCombinedHeight = 0;
-					for (int i = 0; i < 8; ++i) {
-						finalCombinedX += combinedX_scalar[i];
-						finalCombinedY += combinedY_scalar[i];
-						finalCombinedHeight += combinedHeight_scalar[i];
-					}
-
-					// Update vertex position based on the combined Gerstner wave displacements
-					heightMap[x][y].x = worldPos.x + finalCombinedX;
-					heightMap[x][y].y = worldPos.y + finalCombinedHeight;
-					heightMap[x][y].z = worldPos.z + finalCombinedY;
+					heightMap[x][y] = calculateVertex(glm::vec3(x, 0, y));
 				}
 			}
 			});

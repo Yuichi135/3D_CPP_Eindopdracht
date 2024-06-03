@@ -41,4 +41,5 @@ private:
 	void setUpNormals();
 	glm::vec4 getColor(float height);
 	void calculateLoopBounds(int size, int renderDistance, int& startX, int& endX, int& startY, int& endY);
+	glm::vec3 calculateVertex(glm::vec3 pos);
 };
