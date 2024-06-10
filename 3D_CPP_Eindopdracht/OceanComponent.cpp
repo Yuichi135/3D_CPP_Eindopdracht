@@ -9,6 +9,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+// Debug
+//#include "Object.h"
+//#include "CubeComponent.h"
+
 glm::vec2 rotateVector(const glm::vec2& vec, float angle);
 
 OceanComponent::OceanComponent(glm::vec3& cameraPos, int size) : cameraPos(&cameraPos), size(size), vbo(nullptr)
@@ -37,17 +41,13 @@ OceanComponent::OceanComponent(glm::vec3& cameraPos, int size) : cameraPos(&came
 	waveParams.push_back(GerstnerWaveParams{ 0.15f, 0.2f, 0.7f, 1.0f, rotateVector(glm::vec2(1.0f, 0.0f), 20.0f), 3.0f });
 	waveParams.push_back(GerstnerWaveParams{ 0.1f, 0.2f, 0.7f, 1.0f, rotateVector(glm::vec2(1.0f, 0.0f), -20.0f), 4.0f });
 
-	// WIP
-	waveParams.push_back(GerstnerWaveParams{ 0.0f, 0.0f, 1.0f, 0.0f, rotateVector(glm::vec2(1.0f, 0.0f), 0.0f), 1.0f });
-	waveParams.push_back(GerstnerWaveParams{ 0.0f, 0.0f, 1.0f, 0.0f, rotateVector(glm::vec2(1.0f, 0.0f), 0.0f), 1.0f });
-	waveParams.push_back(GerstnerWaveParams{ 0.0f, 0.0f, 1.0f, 0.0f, rotateVector(glm::vec2(1.0f, 0.0f), 0.0f), 1.0f });
-	waveParams.push_back(GerstnerWaveParams{ 0.0f, 0.0f, 1.0f, 0.0f, rotateVector(glm::vec2(1.0f, 0.0f), 0.0f), 1.0f });
 
+	// waveParams moet een meervoud van 8 zijn vanwege SIMD
+	int wavesToAdd = 8 - (waveParams.size() % 8);
 
-	waveParams.push_back(GerstnerWaveParams{ 0.0f, 0.0f, 1.0f, 0.0f, rotateVector(glm::vec2(1.0f, 0.0f), 0.0f), 1.0f });
-	waveParams.push_back(GerstnerWaveParams{ 0.0f, 0.0f, 1.0f, 0.0f, rotateVector(glm::vec2(1.0f, 0.0f), 0.0f), 1.0f });
-	waveParams.push_back(GerstnerWaveParams{ 0.0f, 0.0f, 1.0f, 0.0f, rotateVector(glm::vec2(1.0f, 0.0f), 0.0f), 1.0f });
-	waveParams.push_back(GerstnerWaveParams{ 0.0f, 0.0f, 1.0f, 0.0f, rotateVector(glm::vec2(1.0f, 0.0f), 0.0f), 1.0f });
+	for (int i = 0; i < wavesToAdd; i++)
+		waveParams.push_back(GerstnerWaveParams{ 0.0f, 0.0f, 1.0f, 0.0f, rotateVector(glm::vec2(1.0f, 0.0f), 0.0f), 1.0f });
+
 
 	setUpNormals();
 	setUpVertices();
@@ -67,20 +67,20 @@ void OceanComponent::setUpVertices()
 
 	for (int x = startX; x < endX - 1; x++) {
 		for (int y = startY; y < endY - 1; y++) {
-			//// "Pixalated"
+			////// "Pixalated"
 			//glm::vec4 color = getColor(heightMap[x][y].y);
 			//// Update vertex positions based on the updated heightMap
-			//verts.push_back(Vertex::PCN(heightMap[x][y] * scale, color, normals[x][y]));
-			//verts.push_back(Vertex::PCN(heightMap[x + 1][y] * scale, color, normals[x + 1][y]));
-			//verts.push_back(Vertex::PCN(heightMap[x + 1][y + 1] * scale, color, normals[x + 1][y + 1]));
-			//verts.push_back(Vertex::PCN(heightMap[x][y + 1] * scale, color, normals[x][y + 1]));
+			//verts.push_back(Vertex::PCN(heightMap[x][y], color, normals[x][y]));
+			//verts.push_back(Vertex::PCN(heightMap[x + 1][y], color, normals[x + 1][y]));
+			//verts.push_back(Vertex::PCN(heightMap[x + 1][y + 1], color, normals[x + 1][y + 1]));
+			//verts.push_back(Vertex::PCN(heightMap[x][y + 1], color, normals[x][y + 1]));
+
 
 			// Quads
 			verts.push_back(Vertex::PCN(heightMap[x][y], getColor(heightMap[x][y].y), normals[x][y]));
 			verts.push_back(Vertex::PCN(heightMap[x + 1][y], getColor(heightMap[x + 1][y].y), normals[x + 1][y]));
 			verts.push_back(Vertex::PCN(heightMap[x + 1][y + 1], getColor(heightMap[x + 1][y + 1].y), normals[x + 1][y + 1]));
 			verts.push_back(Vertex::PCN(heightMap[x][y + 1], getColor(heightMap[x][y + 1].y), normals[x][y + 1]));
-
 
 
 			//// TriangleStrip
@@ -266,9 +266,9 @@ glm::vec3 OceanComponent::calculateVertex(glm::vec3 pos)
 	glm::vec3 worldPos;
 
 	// Update vertex position based on the combined Gerstner wave displacements
-	worldPos.x = x - (size / 2.0f) + finalCombinedX;
+	worldPos.x = x + finalCombinedX;
 	worldPos.y = pos.y + finalCombinedHeight;
-	worldPos.z = y - (size / 2.0f) + finalCombinedY;
+	worldPos.z = y + finalCombinedY;
 
 	return worldPos;
 }
@@ -288,32 +288,29 @@ glm::vec2 rotateVector(const glm::vec2& vec, float angle) {
 	return rotatedVec;
 }
 
-// Goed genoeg voor nu
-float OceanComponent::getHeight(int x, int y) {
-	int searchGridSize = 5;
+// Raar gedrag bij lange diepe swells
+float OceanComponent::getHeight(float x, float y) {
+	int iterations = 10;
+	glm::vec3 position(x, 0.0f, y);
+	glm::vec3 displacement(0.0f, 0.0f, 0.0f);
+	float height = 0.0f;
 
-	glm::vec2 pos((float)x, (float)y);
-	float closestHeight = 0.0f; // of FLT_MIN
-	float closestDistancesqrd = FLT_MAX;
+	for (int i = 0; i < iterations; i++) {
+		glm::vec3 sample = calculateVertex(position + displacement);
 
-	for (int i = -searchGridSize; i <= searchGridSize; i++) {
-		for (int j = -searchGridSize; j <= searchGridSize; j++) {
-			int translatedX = (size / 2 + x) + i;
-			int translatedY = (size / 2 + y) + j;
+		displacement.x -= sample.x - position.x;
+		displacement.z -= sample.z - position.z;
 
-			if (translatedX >= size || translatedX < 0 || translatedY >= size || translatedY < 0)
-				continue;
+		height = sample.y;
 
-			float distancesqrd = glm::distance2(pos, glm::vec2(heightMap[translatedX][translatedY].x, heightMap[translatedX][translatedY].y));
-
-			if (distancesqrd < closestDistancesqrd) {
-				closestDistancesqrd = distancesqrd;
-				closestHeight = heightMap[translatedX][translatedY].y;
-			}
-		}
+		// Voor debug (Draw moet dan wel VOOR update komen)
+		//std::shared_ptr<Object> cube = std::make_shared<Object>();
+		//cube->position = glm::vec3(sample);
+		//cube->addComponent(std::make_shared<CubeComponent>(1.0f));
+		//cube->draw();
 	}
 
-	return closestHeight;
+	return height;
 }
 
 void OceanComponent::draw()
@@ -345,13 +342,13 @@ void OceanComponent::update(float deltaTime) {
 	threads.reserve(numThreads);
 
 	for (size_t t = 0; t < numThreads; ++t) {
-		threads.emplace_back([=]() { // Capture 'this' to access member variables
+		threads.emplace_back([=]() {
 			const size_t threadStartX = startX + t * chunkSizeX;
 			const size_t threadEndX = (t == numThreads - 1) ? endX : (startX + (t + 1) * chunkSizeX);
 
 			for (int x = threadStartX; x < threadEndX; ++x) {
 				for (int y = startY; y < endY; ++y) {
-					heightMap[x][y] = calculateVertex(glm::vec3(x, 0, y));
+					heightMap[x][y] = calculateVertex(glm::vec3(x - (size / 2.0f), 0, y - (size / 2.0f)));
 				}
 			}
 			});

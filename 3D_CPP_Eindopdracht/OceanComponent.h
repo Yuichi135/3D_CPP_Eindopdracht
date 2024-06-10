@@ -31,7 +31,7 @@ public:
 	OceanComponent(glm::vec3& cameraPos, int size);
 	~OceanComponent();
 
-	float getHeight(int x, int y);
+	float getHeight(float x, float y);
 
 	virtual void draw() override;
 	virtual void update(float deltaTime) override;
