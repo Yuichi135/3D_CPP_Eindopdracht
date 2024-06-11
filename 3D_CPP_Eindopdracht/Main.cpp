@@ -13,6 +13,7 @@
 #include "CubeComponent.h"
 #include "PhysicsComponent.h"
 #include <string>
+#include "ModelComponent.h"
 
 #pragma comment(lib, "glfw3.lib")
 #pragma comment(lib, "glew32s.lib")
@@ -128,12 +129,12 @@ void init()
 	objects.push_back(ocean);
 
 	std::cout << "Creating cube" << std::endl;
-	std::shared_ptr<Object> cube = std::make_shared<Object>();
-	cube->position = glm::vec3(0.0f, 5.0f, -5.0f);
+	std::shared_ptr<Object> model = std::make_shared<Object>();
+	model->position = glm::vec3(0.0f, 5.0f, -5.0f);
 
-	cube->addComponent(std::make_shared<CubeComponent>(2.0f));
-	cube->addComponent(std::make_shared<PhysicsComponent>(oceanComponent));
-	objects.push_back(cube);
+	model->addComponent(std::make_shared<ModelComponent>("models/buoy.obj"));
+	model->addComponent(std::make_shared<PhysicsComponent>(oceanComponent));
+	objects.push_back(model);
 }
 
 void initWindow()
