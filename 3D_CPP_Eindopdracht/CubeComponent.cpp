@@ -19,6 +19,12 @@ CubeComponent::CubeComponent(float size)
 	verts.push_back(Vertex::PCTN(p + glm::vec3(s.x, s.y, s.z), color, glm::vec2(1, 1), glm::vec3(0, 1, 0)));
 	verts.push_back(Vertex::PCTN(p + glm::vec3(-s.x, s.y, s.z), color, glm::vec2(0, 1), glm::vec3(0, 1, 0)));
 
+	//Top tonen
+	verts.push_back(Vertex::PCTN(p + glm::vec3(-s.x, s.y + 1, -s.z), color, glm::vec2(0, 0), glm::vec3(0, 1, 0)));
+	verts.push_back(Vertex::PCTN(p + glm::vec3(s.x, s.y + 1, -s.z), color, glm::vec2(1, 0), glm::vec3(0, 1, 0)));
+	verts.push_back(Vertex::PCTN(p + glm::vec3(s.x, s.y + 1, s.z), color, glm::vec2(1, 1), glm::vec3(0, 1, 0)));
+	verts.push_back(Vertex::PCTN(p + glm::vec3(-s.x, s.y + 1, s.z), color, glm::vec2(0, 1), glm::vec3(0, 1, 0)));
+
 	//left
 	verts.push_back(Vertex::PCTN(p + glm::vec3(s.x, -s.y, -s.z), color, glm::vec2(0, 0), glm::vec3(1, 0, 0)));
 	verts.push_back(Vertex::PCTN(p + glm::vec3(s.x, s.y, -s.z), color, glm::vec2(1, 0), glm::vec3(1, 0, 0)));

@@ -21,6 +21,8 @@ public:
 	glm::vec3 rotation = glm::vec3(0.0f);
 	glm::vec3 scale = glm::vec3(1.0f);
 
+	glm::mat4 getModelMatrix(const glm::mat4 & = glm::mat4(1.0f));
+
 	void addComponent(std::shared_ptr<Component> component);
 	void removeComponent(std::shared_ptr<Component> component);
 	std::list<std::shared_ptr<Component>> getComponents();

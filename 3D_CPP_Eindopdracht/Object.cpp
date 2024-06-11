@@ -8,6 +8,18 @@ Object::Object() = default;
 
 Object::~Object() = default;
 
+glm::mat4 Object::getModelMatrix(const glm::mat4& parentMatrix)
+{
+	glm::mat4 modelMatrix = parentMatrix;
+	modelMatrix = glm::translate(modelMatrix, position);
+	modelMatrix = glm::rotate(modelMatrix, rotation.x, glm::vec3(1, 0, 0));
+	modelMatrix = glm::rotate(modelMatrix, rotation.y, glm::vec3(0, 1, 0));
+	modelMatrix = glm::rotate(modelMatrix, rotation.z, glm::vec3(0, 0, 1));
+	modelMatrix = glm::scale(modelMatrix, scale);
+
+	return modelMatrix;
+}
+
 void Object::addComponent(std::shared_ptr<Component> component)
 {
 	component->setParentObject(this);
@@ -34,12 +46,7 @@ void Object::draw(const glm::mat4& parentMatrix)
 {
 	if (!drawComponent) return;
 
-	glm::mat4 modelMatrix = parentMatrix;
-	modelMatrix = glm::translate(modelMatrix, position);
-	modelMatrix = glm::rotate(modelMatrix, rotation.x, glm::vec3(1, 0, 0));
-	modelMatrix = glm::rotate(modelMatrix, rotation.y, glm::vec3(0, 1, 0));
-	modelMatrix = glm::rotate(modelMatrix, rotation.z, glm::vec3(0, 0, 1));
-	modelMatrix = glm::scale(modelMatrix, scale);
+	auto modelMatrix = getModelMatrix(parentMatrix);
 
 	tigl::shader->setModelMatrix(modelMatrix);
 

@@ -9,6 +9,7 @@ class PhysicsComponent : public Component
 	std::shared_ptr<OceanComponent> ocean;
 	glm::vec3 positionOld = glm::vec3(FLT_MAX);
 	glm::vec3 acceleration = glm::vec3(0.0f);
+	glm::vec3 angularVelocity = glm::vec3(0.0f);
 
 public:
 	PhysicsComponent(std::shared_ptr<OceanComponent> ocean);

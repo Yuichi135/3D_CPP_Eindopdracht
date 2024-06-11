@@ -273,6 +273,74 @@ glm::vec3 OceanComponent::calculateVertex(glm::vec3 pos)
 	return worldPos;
 }
 
+glm::vec3 OceanComponent::calculateNormal(glm::vec3 pos)
+{
+	float x = pos.x;
+	float y = pos.z;
+
+	__m256 combinedNx = _mm256_setzero_ps();
+	__m256 combinedNy = _mm256_setzero_ps();
+
+	for (size_t i = 0; i < waveParams.size(); i += 8) {
+		// Load wave parameters into SIMD registers
+		__m256 pDirectionX = _mm256_set_ps(
+			waveParams[i + 7].direction.x, waveParams[i + 6].direction.x, waveParams[i + 5].direction.x,
+			waveParams[i + 4].direction.x, waveParams[i + 3].direction.x, waveParams[i + 2].direction.x,
+			waveParams[i + 1].direction.x, waveParams[i].direction.x);
+
+		__m256 pDirectionY = _mm256_set_ps(
+			waveParams[i + 7].direction.y, waveParams[i + 6].direction.y, waveParams[i + 5].direction.y,
+			waveParams[i + 4].direction.y, waveParams[i + 3].direction.y, waveParams[i + 2].direction.y,
+			waveParams[i + 1].direction.y, waveParams[i].direction.y);
+
+		__m256 pPhase = _mm256_set_ps(
+			waveParams[i + 7].phase, waveParams[i + 6].phase, waveParams[i + 5].phase,
+			waveParams[i + 4].phase, waveParams[i + 3].phase, waveParams[i + 2].phase,
+			waveParams[i + 1].phase, waveParams[i].phase);
+
+		__m256 pSpeed = _mm256_set_ps(
+			waveParams[i + 7].speed, waveParams[i + 6].speed, waveParams[i + 5].speed,
+			waveParams[i + 4].speed, waveParams[i + 3].speed, waveParams[i + 2].speed,
+			waveParams[i + 1].speed, waveParams[i].speed);
+
+		__m256 pWaveLength = _mm256_set_ps(
+			waveParams[i + 7].waveLength, waveParams[i + 6].waveLength, waveParams[i + 5].waveLength,
+			waveParams[i + 4].waveLength, waveParams[i + 3].waveLength, waveParams[i + 2].waveLength,
+			waveParams[i + 1].waveLength, waveParams[i].waveLength);
+
+		__m256 x_vec = _mm256_set1_ps(static_cast<float>(x));
+		__m256 y_vec = _mm256_set1_ps(static_cast<float>(y));
+
+		__m256 dotProduct = _mm256_add_ps(_mm256_mul_ps(pDirectionX, x_vec), _mm256_mul_ps(pDirectionY, y_vec));
+
+		__m256 phaseDelta = _mm256_mul_ps(_mm256_add_ps(pPhase, _mm256_set1_ps(phase)), pSpeed);
+
+		__m256 angle = _mm256_add_ps(_mm256_mul_ps(pWaveLength, dotProduct), phaseDelta);
+
+		__m256 cosAngle = _mm256_cos_ps(angle);
+
+		combinedNx = _mm256_add_ps(combinedNx, _mm256_mul_ps(_mm256_div_ps(pDirectionX, pWaveLength), cosAngle));
+		combinedNy = _mm256_add_ps(combinedNy, _mm256_mul_ps(_mm256_div_ps(pDirectionY, pWaveLength), cosAngle));
+	}
+
+	float combinedNx_scalar[8];
+	float combinedNy_scalar[8];
+
+	_mm256_store_ps(combinedNx_scalar, combinedNx);
+	_mm256_store_ps(combinedNy_scalar, combinedNy);
+
+	float finalCombinedNx = 0;
+	float finalCombinedNy = 0;
+	for (int i = 0; i < 8; ++i) {
+		finalCombinedNx += combinedNx_scalar[i];
+		finalCombinedNy += combinedNy_scalar[i];
+	}
+
+	// Compute the normal
+	glm::vec3 normal = glm::normalize(glm::vec3(-finalCombinedNx, 1.0f, -finalCombinedNy));
+
+	return normal;
+}
 
 glm::vec2 rotateVector(const glm::vec2& vec, float angle) {
 	float angleRad = glm::radians(angle);
@@ -311,6 +379,11 @@ float OceanComponent::getHeight(float x, float y) {
 	}
 
 	return height;
+}
+
+glm::vec3 OceanComponent::getNormal(float x, float y)
+{
+	return calculateNormal(glm::vec3(x, 0.0f, y));
 }
 
 void OceanComponent::draw()

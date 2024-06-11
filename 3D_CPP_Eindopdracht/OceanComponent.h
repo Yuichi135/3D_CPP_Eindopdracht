@@ -32,6 +32,7 @@ public:
 	~OceanComponent();
 
 	float getHeight(float x, float y);
+	glm::vec3 getNormal(float x, float y);
 
 	virtual void draw() override;
 	virtual void update(float deltaTime) override;
@@ -42,4 +43,5 @@ private:
 	glm::vec4 getColor(float height);
 	void calculateLoopBounds(int size, int renderDistance, int& startX, int& endX, int& startY, int& endY);
 	glm::vec3 calculateVertex(glm::vec3 pos);
+	glm::vec3 calculateNormal(glm::vec3 pos);
 };
