@@ -52,7 +52,7 @@ void Object::draw(const glm::mat4& parentMatrix)
 
 	tigl::shader->enableTexture(true);
 
-	drawComponent->draw();
+	drawComponent->draw(modelMatrix);
 
 	tigl::shader->enableTexture(false);
 }
