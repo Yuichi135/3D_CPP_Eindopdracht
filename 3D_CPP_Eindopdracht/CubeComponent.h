@@ -13,5 +13,5 @@ public:
 	CubeComponent(float size = 1.0f);
 	~CubeComponent();
 
-	virtual void draw() override;
+	virtual void draw(glm::mat4 parentMatrix) override;
 };

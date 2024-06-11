@@ -386,10 +386,10 @@ glm::vec3 OceanComponent::getNormal(float x, float y)
 	return calculateNormal(glm::vec3(x, 0.0f, y));
 }
 
-void OceanComponent::draw()
+void OceanComponent::draw(glm::mat4 parentMatrix)
 {
 	tigl::shader->enableTexture(false);
-	glm::mat4 modelMatrix = glm::mat4(1.0f);
+	glm::mat4 modelMatrix = parentMatrix;
 	modelMatrix = glm::scale(modelMatrix, glm::vec3(1.0f)); // Mogelijk slecht idee
 	tigl::shader->setModelMatrix(modelMatrix);
 	tigl::drawVertices(GL_QUADS, vbo);

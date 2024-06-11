@@ -54,7 +54,7 @@ CubeComponent::~CubeComponent()
 {
 }
 
-void CubeComponent::draw()
+void CubeComponent::draw(glm::mat4 parentMatrix)
 {
 	tigl::drawVertices(GL_QUADS, verts);
 }

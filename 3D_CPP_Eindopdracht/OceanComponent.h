@@ -34,7 +34,7 @@ public:
 	float getHeight(float x, float y);
 	glm::vec3 getNormal(float x, float y);
 
-	virtual void draw() override;
+	virtual void draw(glm::mat4 parentMatrix) override;
 	virtual void update(float deltaTime) override;
 private:
 	void setUpVertices();

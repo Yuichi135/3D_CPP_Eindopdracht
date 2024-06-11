@@ -17,6 +17,7 @@ void PhysicsComponent::update(float deltaTime) {
 		return;
 	}
 
+	// TODO aan de hand van een bounding box doen
 	glm::vec2 gridPositions[9] = {
 		glm::vec2(-1.0f, -1.0f),
 		glm::vec2(0.0f, -1.0f),
@@ -58,19 +59,20 @@ void PhysicsComponent::update(float deltaTime) {
 		}
 	}
 
-	// Apply buoyancy force
 	applyForce(totalBuoyancyForce);
 	applyForce(glm::vec3(0.0f, -gravity, 0.0f));
 
-	// Update position
 	glm::vec3 velocity = parentObject->position - positionOld;
-	velocity *= 0.98f; // Damping
+	velocity *= 0.98; // shitty drag
 
 	positionOld = parentObject->position;
 
 	parentObject->position += velocity + (acceleration * deltaTime * deltaTime);
 
-	// Calculate average normal
+	acceleration = glm::vec3(0.0f);
+
+
+	// Rotation
 	averageNormal = glm::normalize(averageNormal / 9.0f);
 
 	// Calculate the desired rotation to align the cube's up vector with the average normal
@@ -82,16 +84,10 @@ void PhysicsComponent::update(float deltaTime) {
 		axis = glm::normalize(axis);
 	}
 
-	// Calculate the rotation angles
 	glm::vec3 desiredRotation = angle * axis;
-
-	// Calculate rotation difference
 	glm::vec3 rotationDifference = desiredRotation - parentObject->rotation;
 
 	// Apply proportional control to adjust angular velocity
-	float proportionalGain = 0.2f; // Increase this value to increase the strength of the force
+	float proportionalGain = 0.2f;
 	parentObject->rotation += proportionalGain * rotationDifference * deltaTime;
-
-	// Reset acceleration
-	acceleration = glm::vec3(0.0f);
 }
