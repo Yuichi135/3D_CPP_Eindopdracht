@@ -13,7 +13,7 @@
 #include <tuple>
 
 #include "Object.h"
-#include "CubeComponent.h"
+//#include "CubeComponent.h"
 
 using tigl::Vertex;
 
@@ -212,7 +212,7 @@ void ModelComponent::draw(glm::mat4 parentMatrix)
 		tigl::end();
 	}
 
-
+	////Draw boundingbox
 	//glm::vec3 minValues = std::get<0>(parentObject->boundingBox);
 	//glm::vec3 maxValues = std::get<1>(parentObject->boundingBox);
 
