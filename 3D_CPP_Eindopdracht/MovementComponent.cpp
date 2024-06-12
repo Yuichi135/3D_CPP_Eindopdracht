@@ -34,7 +34,7 @@ void MovementComponent::update(float deltaTime)
 	if (speed > 1.5f)
 		speed = 1.0f;
 	if (speed < -0.1f)
-		speed = 0.1f;
+		speed = -0.1f;
 
 	direction += wheelDirection;
 
