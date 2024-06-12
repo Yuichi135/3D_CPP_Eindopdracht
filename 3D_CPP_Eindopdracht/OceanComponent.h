@@ -27,6 +27,7 @@ class OceanComponent : public DrawComponent {
 	float phase = 0;
 public:
 	std::vector<GerstnerWaveParams> waveParams;
+	static float waveSpeedMultiplier;
 
 	OceanComponent(glm::vec3& cameraPos, int size);
 	~OceanComponent();

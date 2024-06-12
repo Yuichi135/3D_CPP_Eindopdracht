@@ -4,7 +4,13 @@
 #include <tuple>
 #include "OceanComponent.h"
 #include "ModelComponent.h"
-PhysicsComponent::PhysicsComponent(std::shared_ptr<OceanComponent> ocean, int resolution) : ocean(ocean), resolution(resolution) {}
+
+float PhysicsComponent::waterDensityMultiplier = 1.0f;
+float PhysicsComponent::gravityMultiplier = 1.0f;
+
+PhysicsComponent::PhysicsComponent(std::shared_ptr<OceanComponent> ocean, int resolution) : ocean(ocean), resolution(resolution) {
+
+}
 
 PhysicsComponent::~PhysicsComponent() {}
 
@@ -42,9 +48,6 @@ void PhysicsComponent::update(float deltaTime) {
 		}
 	}
 
-	const float waterDensity = 2.0f;
-	const float gravity = 9.81f * 2;
-
 	glm::vec3 totalBuoyancyForce(0.0f);
 	glm::vec3 totalTorque(0.0f);
 
@@ -66,13 +69,13 @@ void PhysicsComponent::update(float deltaTime) {
 
 		if (globalPoints[i].y < waterLevel) {
 			float submergedVolume = (waterLevel - globalPoints[i].y);
-			glm::vec3 buoyancyForce(0.0f, waterDensity * submergedVolume * gravity, 0.0f);
+			glm::vec3 buoyancyForce(0.0f, waterDensity * waterDensityMultiplier * submergedVolume * gravity * gravityMultiplier, 0.0f);
 			totalBuoyancyForce += buoyancyForce;
 		}
 	}
 
 	applyForce(totalBuoyancyForce / (float)resSqr);
-	applyForce(glm::vec3(0.0f, -gravity, 0.0f));
+	applyForce(glm::vec3(0.0f, -gravity * gravityMultiplier, 0.0f));
 
 	glm::vec3 velocity = parentObject->position - positionOld;
 	velocity *= 0.98; // shitty drag

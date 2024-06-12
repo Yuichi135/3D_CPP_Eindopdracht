@@ -15,6 +15,8 @@
 
 glm::vec2 rotateVector(const glm::vec2& vec, float angle);
 
+float OceanComponent::waveSpeedMultiplier = 1.0f;
+
 OceanComponent::OceanComponent(glm::vec3& cameraPos, int size) : cameraPos(&cameraPos), size(size), vbo(nullptr)
 {
 	heightMap.resize(size, std::vector<glm::vec3>(size, glm::vec3(0.0f)));
@@ -358,7 +360,7 @@ glm::vec2 rotateVector(const glm::vec2& vec, float angle) {
 
 // Raar gedrag bij lange diepe swells
 float OceanComponent::getHeight(float x, float y) {
-	int iterations = 10;
+	int iterations = 5;
 	glm::vec3 position(x, 0.0f, y);
 	glm::vec3 displacement(0.0f, 0.0f, 0.0f);
 	float height = 0.0f;
@@ -398,7 +400,7 @@ void OceanComponent::draw(glm::mat4 parentMatrix)
 // Todo Don't calculated behind camera
 // Todo use heightmap dynamically, not a fixed size (uses a lot of memory)
 void OceanComponent::update(float deltaTime) {
-	phase += deltaTime;
+	phase += deltaTime * waveSpeedMultiplier;
 
 	// Don't do the calculations if to high
 	if (cameraPos->y > renderDistance || cameraPos->y < -renderDistance)

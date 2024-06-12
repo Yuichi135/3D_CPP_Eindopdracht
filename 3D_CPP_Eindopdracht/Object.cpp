@@ -3,6 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "DrawComponent.h"
 #include <memory>
+#include "MovementComponent.h"
 
 Object::Object() = default;
 
@@ -15,6 +16,11 @@ glm::mat4 Object::getModelMatrix(const glm::mat4& parentMatrix)
 	modelMatrix = glm::rotate(modelMatrix, rotation.x, glm::vec3(1, 0, 0));
 	modelMatrix = glm::rotate(modelMatrix, rotation.y, glm::vec3(0, 1, 0));
 	modelMatrix = glm::rotate(modelMatrix, rotation.z, glm::vec3(0, 0, 1));
+
+	auto movement = getComponent<MovementComponent>(); // Rotation from movement
+	if (movement)
+		modelMatrix = glm::rotate(modelMatrix, -movement->direction, glm::vec3(0, 1, 0));
+
 	modelMatrix = glm::scale(modelMatrix, scale);
 
 	return modelMatrix;

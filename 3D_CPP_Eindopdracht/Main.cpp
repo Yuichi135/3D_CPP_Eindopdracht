@@ -14,6 +14,7 @@
 #include "PhysicsComponent.h"
 #include <string>
 #include "ModelComponent.h"
+#include "MovementComponent.h"
 
 #pragma comment(lib, "glfw3.lib")
 #pragma comment(lib, "glew32s.lib")
@@ -64,22 +65,10 @@ int main(void)
 				glfwSwapInterval(vsync ? 1 : 0);
 			}
 
-			for (int i = 0; i < ocean->getComponent<OceanComponent>()->waveParams.size(); ++i)
-			{
-				auto& p = ocean->getComponent<OceanComponent>()->waveParams[i];
-
-				ImGui::SliderFloat(("Radius##" + std::to_string(i)).c_str(), &p.radius, 0.0f, 3.0f);
-				ImGui::SliderFloat(("Steepness##" + std::to_string(i)).c_str(), &p.steepness, 0.0f, 0.7f);
-				ImGui::SliderFloat(("WaveLength##" + std::to_string(i)).c_str(), &p.waveLength, 0.01f, 0.9f);
-				ImGui::SliderFloat(("Speed##" + std::to_string(i)).c_str(), &p.speed, 0.1f, 5.0f);
-
-				ImGui::SliderFloat(("Direction X##" + std::to_string(i)).c_str(), &p.direction.x, -1.0f, 1.0f);
-				ImGui::SliderFloat(("Direction Y##" + std::to_string(i)).c_str(), &p.direction.y, -1.0f, 1.0f);
-				glm::vec2 normalized = glm::normalize(p.direction);
-				p.direction = normalized;
-
-				ImGui::Spacing();
-			}
+			ImGui::Text("Multipliers");
+			ImGui::SliderFloat("Speed", &OceanComponent::waveSpeedMultiplier, 0.0f, 2.0f);
+			ImGui::SliderFloat("Water Density", &PhysicsComponent::waterDensityMultiplier, 0.1f, 5.0f);
+			ImGui::SliderFloat("Gravity", &PhysicsComponent::gravityMultiplier, 0.1f, 5.0f);
 
 			ImGui::End();
 		}
@@ -131,14 +120,16 @@ void init()
 	std::cout << "Creating cube" << std::endl;
 	std::shared_ptr<Object> model = std::make_shared<Object>();
 	model->position = glm::vec3(0.0f, 5.0f, -5.0f);
+	model->centreOffMassOffset.y = 0.3f;
 
 	model->addComponent(std::make_shared<ModelComponent>("models/ship-large.obj"));
-	model->addComponent(std::make_shared<PhysicsComponent>(oceanComponent, 9));
+	model->addComponent(std::make_shared<PhysicsComponent>(oceanComponent, 5));
+	model->addComponent(std::make_shared<MovementComponent>(0.1f));
 	objects.push_back(model);
 
 	std::cout << "Creating buoy 1" << std::endl;
 	std::shared_ptr<Object> buoy1 = std::make_shared<Object>();
-	buoy1->position = glm::vec3(5.0f, 5.0f, 0.0f);
+	buoy1->position = glm::vec3(10.0f, 5.0f, 0.0f);
 	buoy1->centreOffMassOffset.y = -0.3f;
 
 	buoy1->addComponent(std::make_shared<ModelComponent>("models/buoy.obj"));
@@ -147,7 +138,7 @@ void init()
 
 	std::cout << "Creating buoy 2" << std::endl;
 	std::shared_ptr<Object> buoy2 = std::make_shared<Object>();
-	buoy2->position = glm::vec3(-5.0f, 5.0f, 0.0f);
+	buoy2->position = glm::vec3(-10.0f, 5.0f, 0.0f);
 	buoy2->centreOffMassOffset.y = -0.3f;
 
 	buoy2->addComponent(std::make_shared<ModelComponent>("models/buoy.obj"));

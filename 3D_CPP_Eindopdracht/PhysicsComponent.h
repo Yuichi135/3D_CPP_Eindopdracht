@@ -6,6 +6,9 @@
 
 class PhysicsComponent : public Component
 {
+	const float waterDensity = 2.0f; // Beter resultaat
+	const float gravity = 9.81f * 2;
+
 	std::shared_ptr<OceanComponent> ocean;
 	glm::vec3 positionOld = glm::vec3(FLT_MAX);
 	glm::vec3 acceleration = glm::vec3(0.0f);
@@ -14,6 +17,9 @@ class PhysicsComponent : public Component
 	int resolution;
 
 public:
+	static float waterDensityMultiplier;
+	static float gravityMultiplier;
+
 	PhysicsComponent(std::shared_ptr<OceanComponent> ocean, int resolution = 2);
 	~PhysicsComponent();
 

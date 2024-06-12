@@ -56,5 +56,6 @@ CubeComponent::~CubeComponent()
 
 void CubeComponent::draw(glm::mat4 parentMatrix)
 {
+	tigl::shader->enableTexture(false);
 	tigl::drawVertices(GL_QUADS, verts);
 }
