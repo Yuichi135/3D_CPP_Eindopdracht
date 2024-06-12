@@ -18,6 +18,7 @@
 #include "ModelComponentCache.h"
 #include "WindowManager.h"
 
+
 #pragma comment(lib, "glfw3.lib")
 #pragma comment(lib, "glew32s.lib")
 #pragma comment(lib, "opengl32.lib")
@@ -30,13 +31,13 @@ void initImGui();
 void onDestroy();
 void update();
 void draw();
+void createCircleOfBuoys(int count, float radius, std::shared_ptr<OceanComponent> oceanComponent);
 
 
 GLFWwindow* window;
 std::shared_ptr<CameraController> cameraController;
-const int width = 1900;
-const int height = 1000;
 double lastFrameTime = 0;
+const float PI = std::atan(1.0) * 4;
 
 std::list<std::shared_ptr<Object>> objects;
 std::shared_ptr<Object> ocean;
@@ -138,23 +139,9 @@ void init()
 	player->addComponent(std::make_shared<MovementComponent>(0.1f));
 	objects.push_back(player);
 
-	std::cout << "Creating buoy 1" << std::endl;
-	std::shared_ptr<Object> buoy1 = std::make_shared<Object>();
-	buoy1->position = glm::vec3(10.0f, 5.0f, 0.0f);
-	buoy1->centreOffMassOffset.y = -0.3f;
 
-	buoy1->addComponent(ModelComponentCache::loadModel("models/buoy.obj"));
-	buoy1->addComponent(std::make_shared<PhysicsComponent>(oceanComponent));
-	objects.push_back(buoy1);
-
-	std::cout << "Creating buoy 2" << std::endl;
-	std::shared_ptr<Object> buoy2 = std::make_shared<Object>();
-	buoy2->position = glm::vec3(-10.0f, 5.0f, 0.0f);
-	buoy2->centreOffMassOffset.y = -0.3f;
-
-	buoy2->addComponent(ModelComponentCache::loadModel("models/buoy.obj"));
-	buoy2->addComponent(std::make_shared<PhysicsComponent>(oceanComponent));
-	objects.push_back(buoy2);
+	createCircleOfBuoys(10, 50.0f, oceanComponent);
+	createCircleOfBuoys(15, 90.0f, oceanComponent);
 }
 
 void initWindow()
@@ -184,6 +171,24 @@ static void onDestroy()
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui::DestroyContext();
 	glfwTerminate();
+}
+
+void createCircleOfBuoys(int count, float radius, std::shared_ptr<OceanComponent> oceanComponent) {
+	for (int i = 0; i < count; ++i) {
+		float angle = (2 * PI / count) * i;
+		float x = radius * cos(angle);
+		float z = radius * sin(angle);
+
+		std::cout << "Creating buoy " << (i + 1) << " at (" << x << ", 5.0, " << z << ")" << std::endl;
+
+		std::shared_ptr<Object> buoy = std::make_shared<Object>();
+		buoy->position = glm::vec3(x, 5.0f, z);
+		buoy->centreOffMassOffset.y = -0.3f;
+
+		buoy->addComponent(ModelComponentCache::loadModel("models/buoy.obj"));
+		buoy->addComponent(std::make_shared<PhysicsComponent>(oceanComponent));
+		objects.push_back(buoy);
+	}
 }
 
 void update()
