@@ -3,6 +3,7 @@
 #include <list>
 #include <glm/glm.hpp>
 #include <memory>
+#include <tuple>
 
 // Forward declarations
 class Component;
@@ -20,6 +21,9 @@ public:
 	glm::vec3 position = glm::vec3(0.0f);
 	glm::vec3 rotation = glm::vec3(0.0f);
 	glm::vec3 scale = glm::vec3(1.0f);
+
+	std::tuple <glm::vec3, glm::vec3> boundingBox;
+	glm::vec3 centreOffMassOffset;
 
 	glm::mat4 getModelMatrix(const glm::mat4 & = glm::mat4(1.0f));
 

@@ -10,6 +10,10 @@
 #include "Texture.h"
 #include "TextureCache.h"
 #include <glm/gtx/string_cast.hpp>
+#include <tuple>
+
+#include "Object.h"
+#include "CubeComponent.h"
 
 using tigl::Vertex;
 
@@ -171,8 +175,14 @@ ModelComponent::ModelComponent(const std::string& fileName)
 		}
 	}
 	groups.push_back(currentGroup);
+}
 
+void ModelComponent::update(float deltaTime)
+{
+	if (boundingBoxInitialized)
+		return;
 
+	setBoundingBox();
 }
 
 void ModelComponent::draw(glm::mat4 parentMatrix)
@@ -201,6 +211,23 @@ void ModelComponent::draw(glm::mat4 parentMatrix)
 
 		tigl::end();
 	}
+
+
+	//glm::vec3 minValues = std::get<0>(parentObject->boundingBox);
+	//glm::vec3 maxValues = std::get<1>(parentObject->boundingBox);
+
+	//for (int i = 0; i < 8; ++i) {
+	//	glm::vec3 corner(
+	//		(i & 1) ? maxValues.x : minValues.x,
+	//		(i & 2) ? maxValues.y : minValues.y,
+	//		(i & 4) ? maxValues.z : minValues.z
+	//	);
+
+	//	std::shared_ptr<Object> cube = std::make_shared<Object>();
+	//	cube->position = corner + parentObject->position;
+	//	cube->addComponent(std::make_shared<CubeComponent>(0.5f));
+	//	cube->draw();
+	//}
 
 }
 
@@ -288,6 +315,28 @@ void ModelComponent::loadMaterialFile(const std::string& fileName, const std::st
 	if (currentMaterial != NULL)
 		materials.push_back(currentMaterial);
 
+}
+
+void ModelComponent::setBoundingBox()
+{
+	glm::vec3 minValues = vertices[0];
+	glm::vec3 maxValues = vertices[0];
+
+	for (const auto& v : vertices) {
+		minValues.x = std::min(minValues.x, v.x);
+		minValues.y = std::min(minValues.y, v.y);
+		minValues.z = std::min(minValues.z, v.z);
+
+		maxValues.x = std::max(maxValues.x, v.x);
+		maxValues.y = std::max(maxValues.y, v.y);
+		maxValues.z = std::max(maxValues.z, v.z);
+	}
+
+	std::cout << "MAX: " << maxValues.x << "\t" << maxValues.y << "\t" << maxValues.z << std::endl;
+	std::cout << "MIN: " << minValues.x << "\t" << minValues.y << "\t" << minValues.z << std::endl;
+
+	parentObject->boundingBox = std::make_tuple(minValues, maxValues);
+	boundingBoxInitialized = true;
 }
 
 ModelComponent::MaterialInfo::MaterialInfo()
