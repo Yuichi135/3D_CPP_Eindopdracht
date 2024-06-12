@@ -43,7 +43,7 @@ OceanComponent::OceanComponent(glm::vec3& cameraPos, int size) : cameraPos(&came
 
 
 	// waveParams moet een meervoud van 8 zijn vanwege SIMD
-	int wavesToAdd = 8 - (waveParams.size() % 8);
+	int wavesToAdd = (8 - (waveParams.size() % 8)) % 8;
 
 	for (int i = 0; i < wavesToAdd; i++)
 		waveParams.push_back(GerstnerWaveParams{ 0.0f, 0.0f, 1.0f, 0.0f, rotateVector(glm::vec2(1.0f, 0.0f), 0.0f), 1.0f });

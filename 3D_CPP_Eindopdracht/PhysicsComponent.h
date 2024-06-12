@@ -11,8 +11,10 @@ class PhysicsComponent : public Component
 	glm::vec3 acceleration = glm::vec3(0.0f);
 	glm::vec3 angularVelocity = glm::vec3(0.0f);
 
+	int resolution;
+
 public:
-	PhysicsComponent(std::shared_ptr<OceanComponent> ocean);
+	PhysicsComponent(std::shared_ptr<OceanComponent> ocean, int resolution = 2);
 	~PhysicsComponent();
 
 	void applyForce(const glm::vec3& force);

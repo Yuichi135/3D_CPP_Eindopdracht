@@ -132,9 +132,27 @@ void init()
 	std::shared_ptr<Object> model = std::make_shared<Object>();
 	model->position = glm::vec3(0.0f, 5.0f, -5.0f);
 
-	model->addComponent(std::make_shared<ModelComponent>("models/buoy.obj"));
-	model->addComponent(std::make_shared<PhysicsComponent>(oceanComponent));
+	model->addComponent(std::make_shared<ModelComponent>("models/ship-large.obj"));
+	model->addComponent(std::make_shared<PhysicsComponent>(oceanComponent, 9));
 	objects.push_back(model);
+
+	std::cout << "Creating buoy 1" << std::endl;
+	std::shared_ptr<Object> buoy1 = std::make_shared<Object>();
+	buoy1->position = glm::vec3(5.0f, 5.0f, 0.0f);
+	buoy1->centreOffMassOffset.y = -0.3f;
+
+	buoy1->addComponent(std::make_shared<ModelComponent>("models/buoy.obj"));
+	buoy1->addComponent(std::make_shared<PhysicsComponent>(oceanComponent));
+	objects.push_back(buoy1);
+
+	std::cout << "Creating buoy 2" << std::endl;
+	std::shared_ptr<Object> buoy2 = std::make_shared<Object>();
+	buoy2->position = glm::vec3(-5.0f, 5.0f, 0.0f);
+	buoy2->centreOffMassOffset.y = -0.3f;
+
+	buoy2->addComponent(std::make_shared<ModelComponent>("models/buoy.obj"));
+	buoy2->addComponent(std::make_shared<PhysicsComponent>(oceanComponent));
+	objects.push_back(buoy2);
 }
 
 void initWindow()

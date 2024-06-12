@@ -4,7 +4,7 @@
 #include <tuple>
 #include "OceanComponent.h"
 #include "ModelComponent.h"
-PhysicsComponent::PhysicsComponent(std::shared_ptr<OceanComponent> ocean) : ocean(ocean) {}
+PhysicsComponent::PhysicsComponent(std::shared_ptr<OceanComponent> ocean, int resolution) : ocean(ocean), resolution(resolution) {}
 
 PhysicsComponent::~PhysicsComponent() {}
 
@@ -19,7 +19,6 @@ void PhysicsComponent::update(float deltaTime) {
 		return;
 	}
 
-	int resolution = 6;
 	const int resSqr = resolution * resolution;
 	glm::vec3 minValues = std::get<0>(parentObject->boundingBox);
 	glm::vec3 maxValues = std::get<1>(parentObject->boundingBox);
