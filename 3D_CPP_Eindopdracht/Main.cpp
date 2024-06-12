@@ -16,6 +16,7 @@
 #include "ModelComponent.h"
 #include "MovementComponent.h"
 #include "ModelComponentCache.h"
+#include "WindowManager.h"
 
 #pragma comment(lib, "glfw3.lib")
 #pragma comment(lib, "glew32s.lib")
@@ -158,16 +159,7 @@ void init()
 
 void initWindow()
 {
-	if (!glfwInit()) throw "Could not initialize glwf";
-	window = glfwCreateWindow(width, height, "Hello World", NULL, NULL);
-
-	if (!window)
-	{
-		glfwTerminate();
-		throw "Could not initialize glwf";
-	}
-
-	glfwMakeContextCurrent(window);
+	window = WindowManager::getInstance().getWindow();
 }
 
 void initImGui() {

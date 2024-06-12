@@ -177,6 +177,7 @@
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TextureCache.h" />
     <ClInclude Include="tigl.h" />
+    <ClInclude Include="WindowManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
