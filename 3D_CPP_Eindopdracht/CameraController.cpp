@@ -2,12 +2,14 @@
 #include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
+#include "WindowManager.h"
 
 
 void key_Callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
-CameraController::CameraController(GLFWwindow* window)
+CameraController::CameraController()
 {
+	window = WindowManager::getInstance().getWindow();
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	if (glfwRawMouseMotionSupported())
 		glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
@@ -24,7 +26,7 @@ glm::mat4 CameraController::getMatrix()
 	return ret;
 }
 
-void CameraController::update(GLFWwindow* window)
+void CameraController::update()
 {
 	int multiplier = (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) ? 1 : 10;
 

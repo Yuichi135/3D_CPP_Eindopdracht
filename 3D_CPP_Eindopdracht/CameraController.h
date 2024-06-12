@@ -5,16 +5,17 @@ struct GLFWwindow;
 
 class CameraController
 {
-public:
-	CameraController(GLFWwindow*);
-
-	glm::mat4 getMatrix();
-	void update(GLFWwindow*);
-
-	glm::vec3 position = glm::vec3(0, 0, 0);
-private:
+	GLFWwindow* window;
 	glm::vec2 rotation = glm::vec2(0, 0);
 
 	void move(float angle, float fac);
 	void moveY(float height);
+
+public:
+	CameraController();
+
+	glm::mat4 getMatrix();
+	void update();
+
+	glm::vec3 position = glm::vec3(0, 0, 0);
 };

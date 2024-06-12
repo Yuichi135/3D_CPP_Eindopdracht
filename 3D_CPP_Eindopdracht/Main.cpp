@@ -116,7 +116,7 @@ void init()
 	tigl::shader->setShinyness(0);
 
 
-	cameraController = std::make_shared<CameraController>(window);
+	cameraController = std::make_shared<CameraController>();
 	glPointSize(5.0f);
 
 	std::cout << "Creating ocean" << std::endl;
@@ -188,7 +188,7 @@ static void onDestroy()
 
 void update()
 {
-	cameraController->update(window);
+	cameraController->update();
 
 	double currentFrameTime = glfwGetTime();
 	double deltaTime = currentFrameTime - lastFrameTime;
