@@ -15,6 +15,7 @@
 #include <string>
 #include "ModelComponent.h"
 #include "MovementComponent.h"
+#include "ModelComponentCache.h"
 
 #pragma comment(lib, "glfw3.lib")
 #pragma comment(lib, "glew32s.lib")
@@ -122,7 +123,7 @@ void init()
 	model->position = glm::vec3(0.0f, 5.0f, -5.0f);
 	model->centreOffMassOffset.y = 0.3f;
 
-	model->addComponent(std::make_shared<ModelComponent>("models/ship-large.obj"));
+	model->addComponent(ModelComponentCache::loadModel("models/ship-large.obj"));
 	model->addComponent(std::make_shared<PhysicsComponent>(oceanComponent, 5));
 	model->addComponent(std::make_shared<MovementComponent>(0.1f));
 	objects.push_back(model);
@@ -132,7 +133,7 @@ void init()
 	buoy1->position = glm::vec3(10.0f, 5.0f, 0.0f);
 	buoy1->centreOffMassOffset.y = -0.3f;
 
-	buoy1->addComponent(std::make_shared<ModelComponent>("models/buoy.obj"));
+	buoy1->addComponent(ModelComponentCache::loadModel("models/buoy.obj"));
 	buoy1->addComponent(std::make_shared<PhysicsComponent>(oceanComponent));
 	objects.push_back(buoy1);
 
@@ -141,7 +142,7 @@ void init()
 	buoy2->position = glm::vec3(-10.0f, 5.0f, 0.0f);
 	buoy2->centreOffMassOffset.y = -0.3f;
 
-	buoy2->addComponent(std::make_shared<ModelComponent>("models/buoy.obj"));
+	buoy2->addComponent(ModelComponentCache::loadModel("models/buoy.obj"));
 	buoy2->addComponent(std::make_shared<PhysicsComponent>(oceanComponent));
 	objects.push_back(buoy2);
 }

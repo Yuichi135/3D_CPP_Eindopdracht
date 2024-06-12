@@ -81,6 +81,9 @@
     <ClCompile Include="MovementComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
+    <ClCompile Include="ModelComponentCache.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tigl.h">
@@ -145,6 +148,9 @@
     </ClInclude>
     <ClInclude Include="MovementComponent.h">
       <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelComponentCache.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
