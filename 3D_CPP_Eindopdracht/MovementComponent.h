@@ -8,7 +8,6 @@ public:
 	float direction = FLT_MAX;
 	float speed;
 
-
 	MovementComponent(float speed);
 	~MovementComponent() = default;
 

@@ -39,6 +39,7 @@ double lastFrameTime = 0;
 
 std::list<std::shared_ptr<Object>> objects;
 std::shared_ptr<Object> ocean;
+std::shared_ptr<Object> player;
 
 int main(void)
 {
@@ -67,9 +68,17 @@ int main(void)
 			}
 
 			ImGui::Text("Multipliers");
-			ImGui::SliderFloat("Speed", &OceanComponent::waveSpeedMultiplier, 0.0f, 2.0f);
+			ImGui::SliderFloat("Wave speed", &OceanComponent::waveSpeedMultiplier, 0.0f, 2.0f);
 			ImGui::SliderFloat("Water Density", &PhysicsComponent::waterDensityMultiplier, 0.1f, 5.0f);
 			ImGui::SliderFloat("Gravity", &PhysicsComponent::gravityMultiplier, 0.1f, 5.0f);
+
+			ImGui::Spacing();
+			ImGui::Spacing();
+
+			auto movement = player->getComponent<MovementComponent>();
+			ImGui::Text("Boat controls");
+			ImGui::SliderFloat("Direction", &movement->direction, -3.14f, 3.14f);
+			ImGui::SliderFloat("Boat speed", &movement->speed, -0.1f, 1.0f);
 
 			ImGui::End();
 		}
@@ -118,15 +127,15 @@ void init()
 	std::cout << "Adding ocean to objects" << std::endl;
 	objects.push_back(ocean);
 
-	std::cout << "Creating cube" << std::endl;
-	std::shared_ptr<Object> model = std::make_shared<Object>();
-	model->position = glm::vec3(0.0f, 5.0f, -5.0f);
-	model->centreOffMassOffset.y = 0.3f;
+	std::cout << "Creating player" << std::endl;
+	player = std::make_shared<Object>();
+	player->position = glm::vec3(0.0f, 5.0f, -5.0f);
+	player->centreOffMassOffset.y = 0.3f;
 
-	model->addComponent(ModelComponentCache::loadModel("models/ship-large.obj"));
-	model->addComponent(std::make_shared<PhysicsComponent>(oceanComponent, 5));
-	model->addComponent(std::make_shared<MovementComponent>(0.1f));
-	objects.push_back(model);
+	player->addComponent(ModelComponentCache::loadModel("models/ship-large.obj"));
+	player->addComponent(std::make_shared<PhysicsComponent>(oceanComponent, 5));
+	player->addComponent(std::make_shared<MovementComponent>(0.1f));
+	objects.push_back(player);
 
 	std::cout << "Creating buoy 1" << std::endl;
 	std::shared_ptr<Object> buoy1 = std::make_shared<Object>();
