@@ -79,6 +79,7 @@ int main(void)
 
 			auto movement = player->getComponent<MovementComponent>();
 			ImGui::Text("Boat controls");
+			ImGui::SliderFloat("Wheel direction", &movement->wheelDirection, -0.015f, 0.015f);
 			ImGui::SliderFloat("Direction", &movement->direction, -3.14f, 3.14f);
 			ImGui::SliderFloat("Boat speed", &movement->speed, -0.1f, 1.0f);
 
