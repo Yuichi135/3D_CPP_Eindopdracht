@@ -12,7 +12,7 @@ public:
 	float speed;
 	float wheelDirection;
 
-	MovementComponent(float speed);
+	MovementComponent(float speed = 0.0f);
 	~MovementComponent() = default;
 
 	virtual void update(float deltaTime) override;

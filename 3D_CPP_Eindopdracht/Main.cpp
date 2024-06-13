@@ -137,7 +137,7 @@ void init()
 
 	player->addComponent(ModelComponentCache::loadModel("models/ship-large.obj"));
 	player->addComponent(std::make_shared<PhysicsComponent>(oceanComponent, 5));
-	player->addComponent(std::make_shared<MovementComponent>(0.1f));
+	player->addComponent(std::make_shared<MovementComponent>());
 	objects.push_back(player);
 
 
