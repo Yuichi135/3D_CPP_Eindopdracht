@@ -45,7 +45,7 @@ static inline std::string cleanLine(std::string line) {
 	return line;
 }
 
-void ModelLoader::loadModel(const std::string& fileName, Model& model) {
+bool ModelLoader::loadModel(const std::string& fileName, Model& model) {
 	std::cout << "Loading " << fileName << std::endl;
 	std::string dirName = fileName;
 	if (dirName.rfind("/") != std::string::npos)
@@ -59,7 +59,7 @@ void ModelLoader::loadModel(const std::string& fileName, Model& model) {
 
 	if (!pFile.is_open()) {
 		std::cout << "Could not open file " << fileName << std::endl;
-		return;
+		return false;
 	}
 
 	Model::ObjGroup* currentGroup = new Model::ObjGroup();
@@ -126,6 +126,8 @@ void ModelLoader::loadModel(const std::string& fileName, Model& model) {
 		}
 	}
 	model.groups.push_back(currentGroup);
+
+	return true;
 }
 
 void ModelLoader::loadMaterialFile(const std::string& fileName, const std::string& dirName, Model& model) {

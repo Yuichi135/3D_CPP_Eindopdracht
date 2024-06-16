@@ -87,14 +87,17 @@
     <ClCompile Include="ModelCache.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="testutest.cpp">
-      <Filter>Source Files\unittests</Filter>
-    </ClCompile>
     <ClCompile Include="Model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ModelLoader.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelLoaderTests.cpp">
+      <Filter>Source Files\unittests</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelCacheTests.cpp">
+      <Filter>Source Files\unittests</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

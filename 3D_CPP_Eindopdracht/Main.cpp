@@ -16,6 +16,7 @@
 #include "ModelComponent.h"
 #include "MovementComponent.h"
 #include "WindowManager.h"
+#include "utest.h"
 
 
 #ifdef _TESTING_CONFIG

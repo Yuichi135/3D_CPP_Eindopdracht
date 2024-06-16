@@ -14,3 +14,8 @@ std::shared_ptr<Model> ModelCache::loadModel(const std::string& fileName) {
 	cache[fileName] = model;
 	return model;
 }
+
+void ModelCache::clearCache()
+{
+	cache.clear();
+}
