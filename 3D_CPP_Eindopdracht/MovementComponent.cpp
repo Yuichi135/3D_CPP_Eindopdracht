@@ -5,9 +5,16 @@
 #include <GLFW/glfw3.h>
 #include "WindowManager.h"
 
+const float speedIncrement = 0.5f;
+const float AngleIncrement = 0.025f;
+const float maxSpeed = 1.0f;
+const float minSpeed = -0.1f;
+const float maxWheelAngle = 0.015f;
+
+
 MovementComponent::MovementComponent(float speed) : speed(speed)
 {
-	window = WindowManager::getInstance().getWindow();;
+	window = WindowManager::getInstance().getWindow();
 }
 
 void MovementComponent::update(float deltaTime)
@@ -15,26 +22,24 @@ void MovementComponent::update(float deltaTime)
 	if (direction == FLT_MAX)
 		direction = glm::radians(0.0f);
 
-
 	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-		wheelDirection += 0.025f * deltaTime;
+		wheelDirection += AngleIncrement * deltaTime;
 	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-		wheelDirection -= 0.025f * deltaTime;
+		wheelDirection -= AngleIncrement * deltaTime;
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-		speed += 0.5f * deltaTime;
+		speed += speedIncrement * deltaTime;
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-		speed -= 0.5f * deltaTime;
+		speed -= speedIncrement * deltaTime;
 
-	// Is zolaag omdat het radians zijn maar heb geen zin om het telkens te berekenen
-	if (wheelDirection > 0.015f)
-		wheelDirection = 0.015f;
-	if (wheelDirection < -0.015f)
-		wheelDirection = -0.015f;
+	if (wheelDirection > maxWheelAngle)
+		wheelDirection = maxWheelAngle;
+	if (wheelDirection < -maxWheelAngle)
+		wheelDirection = -maxWheelAngle;
 
-	if (speed > 1.5f)
-		speed = 1.0f;
-	if (speed < -0.1f)
-		speed = -0.1f;
+	if (speed > maxSpeed)
+		speed = maxSpeed;
+	if (speed < minSpeed)
+		speed = minSpeed;
 
 	direction += wheelDirection;
 

@@ -52,9 +52,6 @@ void ModelComponent::setBoundingBox() {
 		maxValues.z = std::max(maxValues.z, v.z);
 	}
 
-	std::cout << "MAX: " << maxValues.x << "\t" << maxValues.y << "\t" << maxValues.z << std::endl;
-	std::cout << "MIN: " << minValues.x << "\t" << minValues.y << "\t" << minValues.z << std::endl;
-
 	parentObject->boundingBox = std::make_tuple(minValues, maxValues);
 	boundingBoxInitialized = true;
 }

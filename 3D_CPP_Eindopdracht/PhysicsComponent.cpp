@@ -48,6 +48,9 @@ void PhysicsComponent::update(float deltaTime) {
 		}
 	}
 
+	constexpr float waterDensity = 2.0f; // Beter resultaat
+	constexpr float gravity = 9.81f * 2;
+
 	glm::vec3 totalBuoyancyForce(0.0f);
 	glm::vec3 totalTorque(0.0f);
 
@@ -81,9 +84,7 @@ void PhysicsComponent::update(float deltaTime) {
 	velocity *= 0.98; // shitty drag
 
 	positionOld = parentObject->position;
-
 	parentObject->position += velocity + (acceleration * deltaTime * deltaTime);
-
 	acceleration = glm::vec3(0.0f);
 
 	// Rotation
@@ -94,14 +95,13 @@ void PhysicsComponent::update(float deltaTime) {
 	glm::vec3 axis = glm::cross(upVector, averageNormal);
 	float angle = acos(glm::dot(upVector, averageNormal));
 
-	if (glm::length(axis) > 0.0f) {
+	if (glm::length(axis) > 0.0f)
 		axis = glm::normalize(axis);
-	}
 
 	glm::vec3 desiredRotation = angle * axis;
 	glm::vec3 rotationDifference = desiredRotation - parentObject->rotation;
 
-	// Apply proportional control to adjust angular velocity
+	// Sensitivity
 	float proportionalGain = 0.2f;
 	parentObject->rotation += proportionalGain * rotationDifference * deltaTime;
 }

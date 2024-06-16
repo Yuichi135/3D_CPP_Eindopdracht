@@ -33,11 +33,14 @@ using tigl::Vertex;
 void init();
 void initWindow();
 void initImGui();
+void updateImGui();
 void onDestroy();
 void update();
 void draw();
 void createCircleOfBuoys(int count, float radius, std::shared_ptr<OceanComponent> oceanComponent);
 
+const int oceanSize = 1000;
+const glm::vec3 backgroundColor(0.3f, 0.4f, 0.6f);
 
 GLFWwindow* window;
 std::shared_ptr<CameraController> cameraController;
@@ -68,36 +71,7 @@ int main(int argc, const char* const argv[])
 		update();
 		draw();
 
-		{
-			ImGui::SetNextWindowPos(ImVec2(0, 0));
-			//ImGui::SetNextWindowSize(ImVec2(0, 200));
-			ImGui::Begin("Debug Window");
-			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-			static bool vsync = true;
-			if (ImGui::Checkbox("Use vsync", &vsync))
-			{
-				glfwSwapInterval(vsync ? 1 : 0);
-			}
-
-			ImGui::Text("Multipliers");
-			ImGui::SliderFloat("Wave speed", &OceanComponent::waveSpeedMultiplier, 0.0f, 2.0f);
-			ImGui::SliderFloat("Water Density", &PhysicsComponent::waterDensityMultiplier, 0.1f, 5.0f);
-			ImGui::SliderFloat("Gravity", &PhysicsComponent::gravityMultiplier, 0.1f, 5.0f);
-
-			ImGui::Spacing();
-			ImGui::Spacing();
-
-			auto movement = player->getComponent<MovementComponent>();
-			ImGui::Text("Boat controls");
-			ImGui::SliderFloat("Wheel direction", &movement->wheelDirection, -0.015f, 0.015f);
-			ImGui::SliderFloat("Direction", &movement->direction, -3.14f, 3.14f);
-			ImGui::SliderFloat("Boat speed", &movement->speed, -0.1f, 1.0f);
-
-			ImGui::End();
-		}
-
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		updateImGui();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -117,15 +91,23 @@ void init()
 
 	glFrontFace(GL_CCW);
 	glEnable(GL_DEPTH_TEST);
-	tigl::shader->enableColor(true);
+
 	tigl::shader->enableLighting(true);
 	tigl::shader->setLightCount(1);
 	tigl::shader->setLightDirectional(0, true);
-	tigl::shader->setLightPosition(0, glm::normalize(glm::vec3(1, 1, 1)));
+	tigl::shader->setLightPosition(0, glm::vec3(0, 1, 0));
 	tigl::shader->setLightAmbient(0, glm::vec3(0.5f, 0.5f, 0.5f));
 	tigl::shader->setLightDiffuse(0, glm::vec3(0.5f, 0.5f, 0.5f));
 	tigl::shader->setLightSpecular(0, glm::vec3(1, 1, 1));
 	tigl::shader->setShinyness(0);
+
+	tigl::shader->setFogColor(backgroundColor);
+	tigl::shader->setFogLinear(75.0f, 90.0f);
+	tigl::shader->enableFog(true);
+
+	tigl::shader->enableColor(true);
+	tigl::shader->enableTexture(false);
+	tigl::shader->enableColorMult(false);
 
 
 	cameraController = std::make_shared<CameraController>();
@@ -134,7 +116,7 @@ void init()
 	std::cout << "Creating ocean" << std::endl;
 	ocean = std::make_shared<Object>();
 	ocean->position = glm::vec3(0.0f);
-	auto oceanComponent = std::make_shared<OceanComponent>(cameraController->position, 1000);
+	auto oceanComponent = std::make_shared<OceanComponent>(cameraController->position, oceanSize);
 	ocean->addComponent(oceanComponent);
 
 	std::cout << "Adding ocean to objects" << std::endl;
@@ -149,7 +131,6 @@ void init()
 	player->addComponent(std::make_shared<PhysicsComponent>(oceanComponent, 5));
 	player->addComponent(std::make_shared<MovementComponent>());
 	objects.push_back(player);
-
 
 	createCircleOfBuoys(10, 50.0f, oceanComponent);
 	createCircleOfBuoys(15, 90.0f, oceanComponent);
@@ -175,6 +156,34 @@ void initImGui() {
 	ImGui::StyleColorsDark();
 }
 
+void updateImGui() {
+	ImGui::SetNextWindowPos(ImVec2(0, 0));
+	ImGui::Begin("Debug Window");
+	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+	static bool vsync = true;
+	if (ImGui::Checkbox("Use vsync", &vsync))
+		glfwSwapInterval(vsync ? 1 : 0);
+
+	ImGui::Text("Multipliers");
+	ImGui::SliderFloat("Wave speed", &OceanComponent::waveSpeedMultiplier, 0.0f, 2.0f);
+	ImGui::SliderFloat("Water Density", &PhysicsComponent::waterDensityMultiplier, 0.1f, 5.0f);
+	ImGui::SliderFloat("Gravity", &PhysicsComponent::gravityMultiplier, 0.1f, 5.0f);
+
+	ImGui::Spacing();
+	ImGui::Spacing();
+
+	auto movement = player->getComponent<MovementComponent>();
+	ImGui::Text("Boat controls");
+	ImGui::SliderFloat("Wheel direction", &movement->wheelDirection, -0.015f, 0.015f);
+	ImGui::SliderFloat("Direction", &movement->direction, -3.14f, 3.14f);
+	ImGui::SliderFloat("Boat speed", &movement->speed, -0.1f, 1.0f);
+
+	ImGui::End();
+
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
 static void onDestroy()
 {
 	std::cout << "DeInitializing." << std::endl;
@@ -185,12 +194,11 @@ static void onDestroy()
 }
 
 void createCircleOfBuoys(int count, float radius, std::shared_ptr<OceanComponent> oceanComponent) {
+	std::cout << "Creating circle of buots " << std::endl;
 	for (int i = 0; i < count; ++i) {
 		float angle = (2 * PI / count) * i;
 		float x = radius * cos(angle);
 		float z = radius * sin(angle);
-
-		std::cout << "Creating buoy " << (i + 1) << " at (" << x << ", 5.0, " << z << ")" << std::endl;
 
 		std::shared_ptr<Object> buoy = std::make_shared<Object>();
 		buoy->position = glm::vec3(x, 5.0f, z);
@@ -217,22 +225,9 @@ void update()
 	}
 }
 
-void drawGroundPlane() {
-	tigl::shader->setModelMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -3.0f, 0.0f)));
-
-	tigl::begin(GL_QUADS);
-
-	tigl::addVertex(Vertex::PC(glm::vec3(-10, 0, 10), glm::vec4(1.0f)));
-	tigl::addVertex(Vertex::PC(glm::vec3(-10, 0, -10), glm::vec4(1.0f)));
-	tigl::addVertex(Vertex::PC(glm::vec3(10, 0, -10), glm::vec4(1.0f)));
-	tigl::addVertex(Vertex::PC(glm::vec3(10, 0, 10), glm::vec4(1.0f)));
-
-	tigl::end();
-}
-
 void draw()
 {
-	glClearColor(0.3f, 0.4f, 0.6f, 1.0f);
+	glClearColor(backgroundColor.x, backgroundColor.y, backgroundColor.z, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	int viewport[4];
@@ -240,33 +235,13 @@ void draw()
 	glm::mat4 projection = glm::perspective(glm::radians(75.0f), viewport[2] / (float)viewport[3], 0.01f, 100.0f);
 
 	tigl::shader->setProjectionMatrix(projection);
-	//tigl::shader->setViewMatrix(camera->getMatrix());
 	tigl::shader->setViewMatrix(cameraController->getMatrix());
 	tigl::shader->setModelMatrix(glm::mat4(1.0f));
 
-	tigl::shader->enableColor(true);
-	tigl::shader->enableLighting(true);
-	tigl::shader->enableTexture(false);
-	tigl::shader->setLightCount(1);
-	tigl::shader->setLightDirectional(0, true);
-	tigl::shader->setLightPosition(0, glm::vec3(0.0f, 6.0f, 0.0f));
-	tigl::shader->setLightAmbient(0, glm::vec3(1.0f));
-	tigl::shader->setLightDiffuse(0, glm::vec3(1.0f));
-	tigl::shader->setLightSpecular(0, glm::vec3(0, 0, 0));
-	tigl::shader->setShinyness(32.0f);
-	tigl::shader->setFogColor(glm::vec3(0.3f, 0.4f, 0.6f));
-	tigl::shader->setFogLinear(75.0f, 90.0f);
-	tigl::shader->enableColorMult(false);
-
-	tigl::shader->enableFog(true);
-	tigl::shader->enableColor(true);
-	glEnable(GL_DEPTH_TEST);
 
 	// draw objects.
 	for (std::shared_ptr<Object>& object : objects)
 	{
 		object->draw();
 	}
-
-	//drawGroundPlane();
 }

@@ -8,7 +8,6 @@
 #include <vector>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
 // Debug
 //#include "Object.h"
 //#include "CubeComponent.h"
@@ -50,6 +49,9 @@ OceanComponent::OceanComponent(glm::vec3& cameraPos, int size) : cameraPos(&came
 	for (int i = 0; i < wavesToAdd; i++)
 		waveParams.push_back(GerstnerWaveParams{ 0.0f, 0.0f, 1.0f, 0.0f, rotateVector(glm::vec2(1.0f, 0.0f), 0.0f), 1.0f });
 
+	for (const auto& wp : waveParams)
+		totalWaveHeight += wp.radius;
+
 
 	setUpNormals();
 	setUpVertices();
@@ -83,14 +85,6 @@ void OceanComponent::setUpVertices()
 			verts.push_back(Vertex::PCN(heightMap[x + 1][y], getColor(heightMap[x + 1][y].y), normals[x + 1][y]));
 			verts.push_back(Vertex::PCN(heightMap[x + 1][y + 1], getColor(heightMap[x + 1][y + 1].y), normals[x + 1][y + 1]));
 			verts.push_back(Vertex::PCN(heightMap[x][y + 1], getColor(heightMap[x][y + 1].y), normals[x][y + 1]));
-
-
-			//// TriangleStrip
-			////// FAIL
-			//verts.push_back(Vertex::PCN(heightMap[x][y], getColor(heightMap[x][y].y), normals[x][y]));
-			//verts.push_back(Vertex::PCN(heightMap[x][y + 1], getColor(heightMap[x][y + 1].y), normals[x][y + 1]));
-			//verts.push_back(Vertex::PCN(heightMap[x + 1][y], getColor(heightMap[x + 1][y].y), normals[x + 1][y]));
-			//verts.push_back(Vertex::PCN(heightMap[x + 1][y + 1], getColor(heightMap[x + 1][y + 1].y), normals[x + 1][y + 1]));
 		}
 	}
 
@@ -142,13 +136,9 @@ void OceanComponent::setUpNormals()
 
 glm::vec4 OceanComponent::getColor(float height)
 {
-	float p = (height - -3.0f) / (4.0f - -3.0f);
-
-	glm::vec4 top = glm::vec4(0.67450980392f, 0.94901960784f, 0.89803921568f, 1); // Very light cyan
-	//glm::vec4 middle = glm::vec4(0.16470588235f, 0.69019607843f, 0.54901960784f, 1); // Cyan
-	glm::vec4 middle = glm::vec4(0.06666666666f, 0.40392156862f, 0.54901960784f, 1); // Turquoise 
-	glm::vec4 bottom = glm::vec4(0.01176470588f, 0.15686274509f, 0.21960784313f, 1); // Dark blue 
-
+	float min = -totalWaveHeight - 3;
+	float max = totalWaveHeight - 2;
+	float p = (height - min) / (max - min);
 	glm::vec4 color;
 
 	if (p <= 0.8f) {
@@ -360,12 +350,11 @@ glm::vec2 rotateVector(const glm::vec2& vec, float angle) {
 
 // Raar gedrag bij lange diepe swells
 float OceanComponent::getHeight(float x, float y) {
-	int iterations = 5;
 	glm::vec3 position(x, 0.0f, y);
 	glm::vec3 displacement(0.0f, 0.0f, 0.0f);
 	float height = 0.0f;
 
-	for (int i = 0; i < iterations; i++) {
+	for (int i = 0; i < heightSampleIterations; i++) {
 		glm::vec3 sample = calculateVertex(position + displacement);
 
 		displacement.x -= sample.x - position.x;
@@ -391,10 +380,11 @@ glm::vec3 OceanComponent::getNormal(float x, float y)
 void OceanComponent::draw(glm::mat4 parentMatrix)
 {
 	tigl::shader->enableTexture(false);
+	tigl::shader->enableLighting(false);
 	glm::mat4 modelMatrix = parentMatrix;
-	modelMatrix = glm::scale(modelMatrix, glm::vec3(1.0f)); // Mogelijk slecht idee
 	tigl::shader->setModelMatrix(modelMatrix);
 	tigl::drawVertices(GL_QUADS, vbo);
+	tigl::shader->enableLighting(true);
 }
 
 // Todo Don't calculated behind camera
@@ -433,6 +423,6 @@ void OceanComponent::update(float deltaTime) {
 		thread.join();
 	}
 
-	//setUpNormals();
+	//setUpNormals(); // Niet de rekentijd waard
 	setUpVertices();
 }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="3" name="All">
+<testsuite name="Tests" tests="3">
+<testcase name="ModelCache.">E:\Avans\Jaar 2\3D_Graphics\3D_CPP_Eindopdracht\3D_CPP_Eindopdracht\ModelCacheTests.cpp:21: Failure (Expected != Actual)
+</testcase>
+<testcase name="ModelLoader.loadModel"></testcase>
+<testcase name="ModelLoader.loadModelNonexistent"></testcase>
+</testsuite>
+</testsuites>
