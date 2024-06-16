@@ -17,7 +17,7 @@
 #include "MovementComponent.h"
 #include "ModelComponentCache.h"
 #include "WindowManager.h"
-#include "utest.h"
+
 
 #ifdef _TESTING_CONFIG
 UTEST_STATE();
@@ -145,14 +145,14 @@ void init()
 	player->position = glm::vec3(0.0f, 5.0f, -5.0f);
 	player->centreOffMassOffset.y = 0.3f;
 
-	player->addComponent(ModelComponentCache::loadModel("models/ship-large.obj"));
+	player->addComponent(std::make_shared<ModelComponent>("models/ship-large.obj"));
 	player->addComponent(std::make_shared<PhysicsComponent>(oceanComponent, 5));
 	player->addComponent(std::make_shared<MovementComponent>());
 	objects.push_back(player);
 
 
-	createCircleOfBuoys(10, 50.0f, oceanComponent);
-	createCircleOfBuoys(15, 90.0f, oceanComponent);
+	//createCircleOfBuoys(10, 50.0f, oceanComponent);
+	//createCircleOfBuoys(15, 90.0f, oceanComponent);
 }
 
 void initWindow()
@@ -196,7 +196,7 @@ void createCircleOfBuoys(int count, float radius, std::shared_ptr<OceanComponent
 		buoy->position = glm::vec3(x, 5.0f, z);
 		buoy->centreOffMassOffset.y = -0.3f;
 
-		buoy->addComponent(ModelComponentCache::loadModel("models/buoy.obj"));
+		buoy->addComponent(std::make_shared<ModelComponent>("models/buoy.obj"));
 		buoy->addComponent(std::make_shared<PhysicsComponent>(oceanComponent));
 		objects.push_back(buoy);
 	}
