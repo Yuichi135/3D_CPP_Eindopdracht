@@ -17,6 +17,8 @@
 #include "MovementComponent.h"
 #include "WindowManager.h"
 #include "utest.h"
+#include <fstream>
+#include <ctime>
 
 
 #ifdef _TESTING_CONFIG
@@ -38,6 +40,7 @@ void onDestroy();
 void update();
 void draw();
 void createCircleOfBuoys(int count, float radius, std::shared_ptr<OceanComponent> oceanComponent);
+void log();
 
 const int oceanSize = 1000;
 const glm::vec3 backgroundColor(0.3f, 0.4f, 0.6f);
@@ -164,6 +167,11 @@ void updateImGui() {
 	if (ImGui::Checkbox("Use vsync", &vsync))
 		glfwSwapInterval(vsync ? 1 : 0);
 
+
+	if (ImGui::Button("Save.. something"))
+		log();
+
+
 	ImGui::Text("Multipliers");
 	ImGui::SliderFloat("Wave speed", &OceanComponent::waveSpeedMultiplier, 0.0f, 2.0f);
 	ImGui::SliderFloat("Water Density", &PhysicsComponent::waterDensityMultiplier, 0.1f, 5.0f);
@@ -243,5 +251,32 @@ void draw()
 	for (std::shared_ptr<Object>& object : objects)
 	{
 		object->draw();
+	}
+}
+
+void log() {
+	// get time
+	std::time_t now = std::time(nullptr);
+	struct tm timeinfo;
+	char buf[80];
+
+	localtime_s(&timeinfo, &now);
+	std::strftime(buf, sizeof(buf), "%Y%m%d_%H%M%S", &timeinfo);
+
+
+	std::string filename = "log_" + std::string(buf) + ".txt";
+	std::ofstream logFile(filename);
+	if (logFile.is_open()) {
+		int counter = 0;
+		for (std::shared_ptr<Object>& object : objects)
+		{
+			counter++;
+			logFile << "Object " << counter << ", position: " << "X: " << object->position.x << "\tY: " << object->position.y << "\tZ: " << object->position.z << std::endl;
+		}
+		logFile.close();
+		std::cout << "Log written to file: " << filename << std::endl;
+	}
+	else {
+		std::cerr << "Unable to open log file: " << filename << std::endl;
 	}
 }
