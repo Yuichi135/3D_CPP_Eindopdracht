@@ -17,6 +17,11 @@
 #include "MovementComponent.h"
 #include "ModelComponentCache.h"
 #include "WindowManager.h"
+#include "utest.h"
+
+#ifdef _TESTING_CONFIG
+UTEST_STATE();
+#endif
 
 
 #pragma comment(lib, "glfw3.lib")
@@ -43,8 +48,13 @@ std::list<std::shared_ptr<Object>> objects;
 std::shared_ptr<Object> ocean;
 std::shared_ptr<Object> player;
 
-int main(void)
+int main(int argc, const char* const argv[])
 {
+
+#ifdef _TESTING_CONFIG
+	return utest_main(argc, argv);
+#endif
+
 	init();
 
 	while (!glfwWindowShouldClose(window))

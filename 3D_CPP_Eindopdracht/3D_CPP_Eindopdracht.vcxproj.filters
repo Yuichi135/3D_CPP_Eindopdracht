@@ -22,6 +22,9 @@
     <Filter Include="Components">
       <UniqueIdentifier>{c12d3503-6429-44e3-8732-d1b99e99b710}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\unittests">
+      <UniqueIdentifier>{595e648a-2918-46fe-9894-0371d6590246}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -83,6 +86,9 @@
     </ClCompile>
     <ClCompile Include="ModelComponentCache.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="testutest.cpp">
+      <Filter>Source Files\unittests</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -153,6 +159,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="WindowManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
