@@ -1,10 +1,11 @@
 #pragma once
 #include "DrawComponent.h"
 #include "Model.h"
+#include <memory>
 
 class ModelComponent : public DrawComponent {
 private:
-	Model model;
+	std::shared_ptr<Model> model;
 	bool boundingBoxInitialized = false;
 
 	void setBoundingBox();

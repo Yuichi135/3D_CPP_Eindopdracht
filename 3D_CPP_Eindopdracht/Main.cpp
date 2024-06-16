@@ -15,7 +15,6 @@
 #include <string>
 #include "ModelComponent.h"
 #include "MovementComponent.h"
-#include "ModelComponentCache.h"
 #include "WindowManager.h"
 
 
@@ -151,8 +150,8 @@ void init()
 	objects.push_back(player);
 
 
-	//createCircleOfBuoys(10, 50.0f, oceanComponent);
-	//createCircleOfBuoys(15, 90.0f, oceanComponent);
+	createCircleOfBuoys(10, 50.0f, oceanComponent);
+	createCircleOfBuoys(15, 90.0f, oceanComponent);
 }
 
 void initWindow()

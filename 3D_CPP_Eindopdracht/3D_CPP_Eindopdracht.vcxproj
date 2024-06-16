@@ -209,7 +209,7 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="ModelComponent.cpp" />
-    <ClCompile Include="ModelComponentCache.cpp" />
+    <ClCompile Include="ModelCache.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="MovementComponent.cpp" />
     <ClCompile Include="Object.cpp" />
@@ -235,7 +235,7 @@
     <ClInclude Include="DrawComponent.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="ModelComponent.h" />
-    <ClInclude Include="ModelComponentCache.h" />
+    <ClInclude Include="ModelCache.h" />
     <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="MovementComponent.h" />
     <ClInclude Include="Object.h" />

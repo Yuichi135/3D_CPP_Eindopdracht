@@ -23,14 +23,3 @@ Texture* TextureCache::loadMaterialTexture(const std::string& colorName, const g
 	cache[colorName] = texture;
 	return texture;
 }
-
-// Preload textures.
-void TextureCache::preloadTextures()
-{
-	loadTexture("score_logo.png");
-	loadTexture("sign_stop.png");
-	loadTexture("sign_forward.png");
-	loadTexture("sign_left.png");
-	loadTexture("sign_right.png");
-	std::cout << "Loading all visual cues textures." << std::endl;
-}

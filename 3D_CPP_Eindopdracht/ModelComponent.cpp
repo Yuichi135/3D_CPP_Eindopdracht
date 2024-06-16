@@ -6,9 +6,10 @@
 #include "TextureCache.h"
 #include <glm/gtx/string_cast.hpp>
 #include "Object.h"
+#include "ModelCache.h"
 
 ModelComponent::ModelComponent(const std::string& filename) {
-	ModelLoader::loadModel(filename, model);
+	model = ModelCache::loadModel(filename);
 }
 
 void ModelComponent::update(float deltaTime) {
@@ -21,13 +22,13 @@ void ModelComponent::update(float deltaTime) {
 void ModelComponent::draw(glm::mat4 parentMatrix) {
 	tigl::shader->setModelMatrix(parentMatrix);
 
-	for (const auto& group : model.groups) {
-		model.materials[group->materialIndex]->texture->bind();
+	for (const auto& group : model->groups) {
+		model->materials[group->materialIndex]->texture->bind();
 		tigl::shader->enableTexture(true);
 		tigl::begin(GL_TRIANGLES);
 		for (auto& face : group->faces) {
 			for (const auto& vertex : face.vertices) {
-				tigl::addVertex(tigl::Vertex::PTN(model.vertices[vertex.position], model.texcoords[vertex.texcoord], model.normals[vertex.normal]));
+				tigl::addVertex(tigl::Vertex::PTN(model->vertices[vertex.position], model->texcoords[vertex.texcoord], model->normals[vertex.normal]));
 			}
 		}
 		tigl::end();
@@ -35,10 +36,13 @@ void ModelComponent::draw(glm::mat4 parentMatrix) {
 }
 
 void ModelComponent::setBoundingBox() {
-	glm::vec3 minValues = model.vertices[0];
-	glm::vec3 maxValues = model.vertices[0];
+	if (model->vertices.empty())
+		return;
 
-	for (const auto& v : model.vertices) {
+	glm::vec3 minValues = model->vertices[0];
+	glm::vec3 maxValues = model->vertices[0];
+
+	for (const auto& v : model->vertices) {
 		minValues.x = std::min(minValues.x, v.x);
 		minValues.y = std::min(minValues.y, v.y);
 		minValues.z = std::min(minValues.z, v.z);

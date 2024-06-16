@@ -84,7 +84,7 @@
     <ClCompile Include="MovementComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
-    <ClCompile Include="ModelComponentCache.cpp">
+    <ClCompile Include="ModelCache.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="testutest.cpp">
@@ -161,7 +161,7 @@
     <ClInclude Include="MovementComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
-    <ClInclude Include="ModelComponentCache.h">
+    <ClInclude Include="ModelCache.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="WindowManager.h">
